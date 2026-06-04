@@ -343,6 +343,19 @@
 
   /* FOOTER */
   .footer { text-align:center; padding:20px 0 10px; font-size:0.62rem; color:var(--muted2); letter-spacing:1px; font-family:'DM Mono',monospace; border-top:1px solid var(--border); margin-top:10px; }
+
+  /* ── GITHUB TRENDING ── */
+  .gh-repo{display:flex;flex-direction:column;gap:4px;padding:11px 0;border-bottom:1px solid var(--border)}
+  .gh-repo:last-child{border-bottom:none;padding-bottom:0}
+  .gh-repo-owner{font-family:'DM Mono',monospace;font-size:.63rem;color:var(--muted);margin-bottom:1px}
+  .gh-repo-name{font-size:.85rem;color:var(--text);text-decoration:none;font-weight:500;transition:color .2s;display:flex;align-items:center;gap:6px}
+  .gh-repo-name:hover{color:var(--accent)}
+  .gh-repo-desc{font-size:.74rem;color:var(--text2);line-height:1.5;margin-top:2px}
+  .gh-repo-meta{display:flex;gap:12px;margin-top:4px;font-family:'DM Mono',monospace;font-size:.63rem;color:var(--muted);flex-wrap:wrap;align-items:center}
+  .gh-lang-dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex-shrink:0}
+  .gh-stars-new{color:var(--accent3)}
+  .gh-tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
+
 </style>
 </head>
 <body>
@@ -364,6 +377,106 @@
     <div id="daily-quote"></div>
   </div>
 </header>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SECTION 1 — NEWS FEEDS (loaded on page open)      -->
+<!-- ══════════════════════════════════════════════════ -->
+<div style="font-family:'DM Mono',monospace;font-size:.6rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;padding-left:2px">
+  📡 News &amp; Feeds — <span id="feeds-refresh-time">fetching…</span>
+</div>
+
+<!-- ROW: 4 news columns -->
+<div class="grid-row col-4" style="margin-bottom:20px">
+
+  <div class="panel">
+    <div class="panel-head"><div class="panel-icon ir">📰</div><span class="panel-title">World News</span><span class="panel-badge" id="ap-badge">—</span></div>
+    <div class="panel-body" id="ap-content">
+      <div class="loading-shimmer shimmer-line"></div>
+      <div class="loading-shimmer shimmer-line" style="width:85%"></div>
+      <div class="loading-shimmer shimmer-line" style="width:75%"></div>
+      <div class="loading-shimmer shimmer-line" style="width:90%"></div>
+      <div class="loading-shimmer shimmer-line" style="width:70%"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><div class="panel-icon ir">🧡</div><span class="panel-title">Hacker News · Top</span><span class="panel-badge" id="hn-badge">—</span></div>
+    <div class="panel-body" id="hn-content">
+      <div class="loading-shimmer shimmer-line"></div>
+      <div class="loading-shimmer shimmer-line" style="width:80%"></div>
+      <div class="loading-shimmer shimmer-line" style="width:90%"></div>
+      <div class="loading-shimmer shimmer-line" style="width:65%"></div>
+      <div class="loading-shimmer shimmer-line" style="width:85%"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><div class="panel-icon ir">💻</div><span class="panel-title">BleepingComputer</span><span class="panel-badge" id="bleeping-badge">—</span></div>
+    <div class="panel-body" id="bleeping-content">
+      <div class="loading-shimmer shimmer-line"></div>
+      <div class="loading-shimmer shimmer-line" style="width:75%"></div>
+      <div class="loading-shimmer shimmer-line" style="width:90%"></div>
+      <div class="loading-shimmer shimmer-line" style="width:80%"></div>
+      <div class="loading-shimmer shimmer-line" style="width:70%"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><div class="panel-icon ir">🔐</div><span class="panel-title">Dark Reading</span><span class="panel-badge" id="darkreading-badge">—</span></div>
+    <div class="panel-body" id="darkreading-content">
+      <div class="loading-shimmer shimmer-line"></div>
+      <div class="loading-shimmer shimmer-line" style="width:80%"></div>
+      <div class="loading-shimmer shimmer-line" style="width:70%"></div>
+      <div class="loading-shimmer shimmer-line" style="width:85%"></div>
+      <div class="loading-shimmer shimmer-line" style="width:75%"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ROW: Atlas Obscura + GitHub Trending -->
+<div class="grid-row col-2" style="margin-bottom:28px">
+
+  <div class="panel">
+    <div class="panel-head"><div class="panel-icon io">🗺️</div><span class="panel-title">Atlas Obscura · Curious Places</span><span class="panel-badge" id="atlas-badge">—</span></div>
+    <div class="panel-body" id="atlas-content">
+      <div class="loading-shimmer shimmer-line"></div>
+      <div class="loading-shimmer shimmer-line" style="width:80%"></div>
+      <div class="loading-shimmer shimmer-line" style="width:70%"></div>
+      <div class="loading-shimmer shimmer-line" style="width:85%"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><div class="panel-icon is">⭐</div><span class="panel-title">GitHub · Trending Repositories</span><span class="panel-badge" id="gh-badge">Today</span></div>
+    <div class="panel-body">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+        <div class="gh-tabs" id="gh-lang-tabs" style="margin-bottom:0">
+          <button class="map-tab active" onclick="fetchGHT('','today',this,'')">All</button>
+          <button class="map-tab" onclick="fetchGHT('javascript','today',this,'')">JS</button>
+          <button class="map-tab" onclick="fetchGHT('python','today',this,'')">Python</button>
+          <button class="map-tab" onclick="fetchGHT('rust','today',this,'')">Rust</button>
+          <button class="map-tab" onclick="fetchGHT('','today',this,'ai+ml+machine-learning')">AI/ML</button>
+          <button class="map-tab" onclick="fetchGHT('','today',this,'security+cybersecurity')">Security</button>
+        </div>
+        <div style="display:flex;gap:5px" id="gh-time-tabs">
+          <button class="map-tab active" onclick="setGHTTime('today',this)">Today</button>
+          <button class="map-tab" onclick="setGHTTime('weekly',this)">Week</button>
+        </div>
+      </div>
+      <div id="gh-content">
+        <div class="loading-shimmer shimmer-line"></div>
+        <div class="loading-shimmer shimmer-line" style="width:85%"></div>
+        <div class="loading-shimmer shimmer-line" style="width:70%"></div>
+        <div class="loading-shimmer shimmer-line" style="width:90%"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<!-- ══ END SECTION 1 ══ -->
+
+
 
 <!-- ══ ROW 1: APOD + HISTORY ══ -->
 <div class="grid-main">
@@ -523,48 +636,6 @@
   </div>
 </div>
 
-<!-- ══ ROW 9: WINDOWSWAP + OLD NEWSPAPER ══ -->
-<div class="grid-row col-2">
-  <div class="panel">
-    <div class="panel-head"><div class="panel-icon ib">🪟</div><span class="panel-title">WindowSwap · Someone Else's View</span><span class="panel-badge" id="ws-badge">Live</span></div>
-    <div class="panel-body" style="padding:14px">
-      <div style="font-size:0.75rem;color:var(--muted);margin-bottom:10px;line-height:1.6">A random window view from somewhere in the world. Each load is a different person's home.</div>
-      <div class="map-embed" style="border-radius:10px;overflow:hidden;background:var(--surface2)">
-        <iframe src="https://www.window-swap.com/window" style="width:100%;height:320px;border:none;display:block" title="WindowSwap" loading="lazy"></iframe>
-      </div>
-      <div style="margin-top:10px;text-align:right"><a href="https://www.window-swap.com" target="_blank" rel="noopener" class="smith-link">Open full site →</a></div>
-    </div>
-  </div>
-  <div class="panel">
-    <div class="panel-head"><div class="panel-icon ig">📰</div><span class="panel-title">Old Newspaper · This Day in Print</span><span class="panel-badge" id="newspaper-badge">—</span></div>
-    <div class="panel-body" id="newspaper-content">
-      <div class="loading-shimmer shimmer-block" style="height:160px;margin-bottom:12px"></div>
-      <div class="loading-shimmer shimmer-line" style="width:70%"></div>
-      <div class="loading-shimmer shimmer-line" style="width:50%"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ ROW 10: GOOGLE TRENDS + WIKIPEDIA MOST READ ══ -->
-<div class="grid-row col-2">
-  <div class="panel">
-    <div class="panel-head"><div class="panel-icon ig">📈</div><span class="panel-title">Google Trends · Trending Now</span></div>
-    <div class="panel-body" id="trends-content">
-      <div class="loading-shimmer shimmer-line"></div>
-      <div class="loading-shimmer shimmer-line" style="width:80%"></div>
-      <div class="loading-shimmer shimmer-line" style="width:90%"></div>
-    </div>
-  </div>
-  <div class="panel">
-    <div class="panel-head"><div class="panel-icon is">📖</div><span class="panel-title">Wikipedia · Most Read Today</span></div>
-    <div class="panel-body" id="wikimost-content">
-      <div class="loading-shimmer shimmer-line"></div>
-      <div class="loading-shimmer shimmer-line" style="width:85%"></div>
-      <div class="loading-shimmer shimmer-line" style="width:70%"></div>
-    </div>
-  </div>
-</div>
-
 <!-- ══ ROW 11: SUBREDDIT TOP POST ══ -->
 <div class="grid-row col-3">
   <div class="panel">
@@ -599,20 +670,7 @@
 
 <!-- ══ ROW 12: CYBER SECURITY ══ -->
 <div class="grid-row col-3">
-  <div class="panel">
-    <div class="panel-head"><div class="panel-icon ir">🛡️</div><span class="panel-title">Cyber · Live Attack Map</span></div>
-    <div class="panel-body" style="padding:14px">
-      <div style="font-size:0.72rem;color:var(--muted);margin-bottom:10px">Real-time global cyberattack visualization from Bitdefender's live threat intelligence feed.</div>
-      <div class="map-embed">
-        <iframe src="https://threatmap.bitdefender.com/" style="width:100%;height:300px;border:none;display:block;border-radius:8px" loading="lazy"></iframe>
-      </div>
-      <div style="margin-top:8px;display:flex;gap:10px;flex-wrap:wrap">
-        <a href="https://cybermap.kaspersky.com/" target="_blank" rel="noopener" class="smith-link">Kaspersky Map</a>
-        <a href="https://threatmap.checkpoint.com/" target="_blank" rel="noopener" class="smith-link">Check Point</a>
-        <a href="https://www.fireeye.com/cyber-map/threat-map.html" target="_blank" rel="noopener" class="smith-link">FireEye</a>
-      </div>
     </div>
-  </div>
   <div class="panel">
     <div class="panel-head"><div class="panel-icon ir">⚠️</div><span class="panel-title">CISA · Known Exploited Vulnerabilities</span><span class="panel-badge" id="cisa-badge">—</span></div>
     <div class="panel-body" id="cisa-content">
@@ -1262,80 +1320,7 @@ function renderNewspaper(obj){
 }
 fetchNewspaper();
 
-// ══ WIKIPEDIA MOST READ TODAY ══
-async function fetchWikiMostRead(){
-  const ck=`wikimost_${year}_${month}_${day}`,cached=S(ck);
-  if(cached){renderWikiMostRead(JSON.parse(cached));return;}
-  try{
-    const mm=String(month).padStart(2,'0'),dd=String(day).padStart(2,'0');
-    const res=await fetch(`https://en.wikipedia.org/api/rest_v1/metrics/pageviews/top/en.wikipedia/all-access/${year}/${mm}/${dd}`);
-    const data=await res.json();
-    const articles=(data.items?.[0]?.articles||[])
-      .filter(a=>!['Main_Page','Special:','Wikipedia:','Portal:','File:'].some(s=>a.article.startsWith(s)))
-      .slice(0,10);
-    SS(ck,JSON.stringify(articles));
-    renderWikiMostRead(articles);
-  }catch(e){
-    // Fallback to yesterday
-    try{
-      const yesterday=new Date(now);yesterday.setDate(yesterday.getDate()-1);
-      const ym=String(yesterday.getMonth()+1).padStart(2,'0'),yd=String(yesterday.getDate()).padStart(2,'0');
-      const res=await fetch(`https://en.wikipedia.org/api/rest_v1/metrics/pageviews/top/en.wikipedia/all-access/${yesterday.getFullYear()}/${ym}/${yd}`);
-      const data=await res.json();
-      const articles=(data.items?.[0]?.articles||[])
-        .filter(a=>!['Main_Page','Special:','Wikipedia:','Portal:','File:'].some(s=>a.article.startsWith(s)))
-        .slice(0,10);
-      renderWikiMostRead(articles);
-    }catch(e2){document.getElementById('wikimost-content').innerHTML='<div class="error-msg">Could not load most-read articles.</div>';}
-  }
-}
-
-function renderWikiMostRead(articles){
-  const maxViews=articles[0]?.views||1;
-  document.getElementById('wikimost-content').innerHTML=articles.map((a,i)=>{
-    const name=a.article.replace(/_/g,' ');
-    const views=a.views?a.views.toLocaleString():'';
-    const pct=Math.round((a.views/maxViews)*100);
-    return `<div class="trend-item">
-      <div class="trend-rank">${i+1}</div>
-      <div style="flex:1;min-width:0">
-        <a class="trend-name" href="https://en.wikipedia.org/wiki/${encodeURIComponent(a.article)}" target="_blank" rel="noopener">${esc(name)}</a>
-        <div class="trend-bar"><div class="trend-bar-fill" style="width:${pct}%"></div></div>
-      </div>
-      <div class="trend-views">${views}</div>
-    </div>`;
-  }).join('')||'<div class="error-msg">No data available.</div>';
-}
-fetchWikiMostRead();
-
 // ══ GOOGLE TRENDS (via RSS proxy) ══
-async function fetchTrends(){
-  try{
-    const url='https://api.allorigins.win/get?url='+encodeURIComponent('https://trends.google.com/trends/trendingsearches/daily/rss?geo=US');
-    const res=await fetch(url);const data=await res.json();
-    const parser=new DOMParser(),doc=parser.parseFromString(data.contents,'text/xml');
-    const items=Array.from(doc.querySelectorAll('item')).slice(0,10);
-    if(!items.length)throw new Error();
-    document.getElementById('trends-content').innerHTML=items.map((item,i)=>{
-      const title=item.querySelector('title')?.textContent||'';
-      const traffic=item.querySelector('approx_traffic')?.textContent||item.getElementsByTagNameNS('*','approx_traffic')[0]?.textContent||'';
-      const link=item.querySelector('link')?.textContent||item.querySelector('link')?.nextSibling?.textContent||`https://trends.google.com/trends/explore?q=${encodeURIComponent(title)}&geo=US`;
-      return `<div class="trend-item">
-        <div class="trend-rank">${i+1}</div>
-        <a class="trend-name" href="${esc(link)}" target="_blank" rel="noopener">${esc(title)}</a>
-        ${traffic?`<div class="trend-views">${esc(traffic)}</div>`:''}
-      </div>`;
-    }).join('');
-  }catch(e){
-    // Static fallback with link
-    document.getElementById('trends-content').innerHTML=`
-      <div style="text-align:center;padding:14px 0">
-        <div style="font-size:0.8rem;color:var(--text2);margin-bottom:12px">Google Trends RSS requires a proxy. View directly:</div>
-        <a href="https://trends.google.com/trends/trendingsearches/daily?geo=US" target="_blank" rel="noopener" class="smith-link" style="display:inline-flex">Open Google Trends →</a>
-      </div>`;
-  }
-}
-fetchTrends();
 
 // ══ SUBREDDIT TOP POST ══
 let currentSubreddit='todayilearned';
@@ -1697,6 +1682,288 @@ function loadLocalEvents(){
   `;
 }
 loadLocalEvents();
+
+// ═══════════════════════════════════════════════════
+// RSS FEED SYSTEM — fetches on page load, 1h cache
+// ═══════════════════════════════════════════════════
+const PROXY = 'https://api.allorigins.win/get?url=';
+
+async function fetchRSSCached(url, cacheKey, ttlHours=1) {
+  const cached = S(cacheKey);
+  if (cached) {
+    try {
+      const {data, ts} = JSON.parse(cached);
+      if ((Date.now() - ts) / 3600000 < ttlHours) return data;
+    } catch(e) {}
+  }
+  const res = await fetch(PROXY + encodeURIComponent(url));
+  const json = await res.json();
+  SS(cacheKey, JSON.stringify({data: json.contents, ts: Date.now()}));
+  return json.contents;
+}
+
+function timeSince(date) {
+  const s = Math.floor((new Date() - date) / 1000);
+  if (s < 3600) return Math.floor(s/60) + 'm ago';
+  if (s < 86400) return Math.floor(s/3600) + 'h ago';
+  return Math.floor(s/86400) + 'd ago';
+}
+
+function renderRSSFeed(xmlText, elId, sourceName, badgeId, count=7) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(xmlText, 'text/xml');
+  const items = Array.from(doc.querySelectorAll('item')).slice(0, count);
+  if (!items.length) throw new Error('no items');
+  const html = items.map(item => {
+    const title = item.querySelector('title')?.textContent || '';
+    let link = item.querySelector('link')?.textContent || '';
+    if (!link) {
+      const ln = item.querySelector('link');
+      link = ln?.nextSibling?.textContent || ln?.getAttribute('href') || '#';
+    }
+    const pub = item.querySelector('pubDate')?.textContent || item.querySelector('updated')?.textContent || '';
+    const desc = item.querySelector('description')?.textContent || item.querySelector('summary')?.textContent || '';
+    const div = document.createElement('div'); div.innerHTML = desc;
+    const clean = div.textContent.replace(/\s+/g,' ').trim().slice(0, 110);
+    const timeAgo = pub ? timeSince(new Date(pub)) : '';
+    return `<div class="news-item">
+      <a class="news-title" href="${esc(link.trim())}" target="_blank" rel="noopener">${esc(title.trim())}</a>
+      ${clean ? `<div class="news-desc">${esc(clean)}${clean.length >= 110 ? '…' : ''}</div>` : ''}
+      <div class="news-meta">${esc(sourceName)}${timeAgo ? ' · ' + timeAgo : ''}</div>
+    </div>`;
+  }).join('');
+  document.getElementById(elId).innerHTML = html +
+    `<div style="font-family:'DM Mono',monospace;font-size:.58rem;color:var(--muted2);margin-top:10px;padding-top:8px;border-top:1px solid var(--border);text-align:right">
+      Fetched ${new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
+    </div>`;
+  if (badgeId) document.getElementById(badgeId).textContent = new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+}
+
+function rssFallback(elId, name, url) {
+  document.getElementById(elId).innerHTML = `<div style="text-align:center;padding:14px 0">
+    <div style="font-size:.78rem;color:var(--text2);margin-bottom:10px">RSS via proxy unavailable. Visit directly:</div>
+    <a href="${esc(url)}" target="_blank" rel="noopener" style="font-size:.75rem;color:var(--accent);text-decoration:none">${esc(name)} →</a>
+  </div>`;
+}
+
+// ── World News (BBC World)
+async function fetchAPNews() {
+  try {
+    const xml = await fetchRSSCached('https://feeds.bbci.co.uk/news/world/rss.xml','rss_bbc',1);
+    renderRSSFeed(xml, 'ap-content', 'BBC World', 'ap-badge', 7);
+  } catch(e) { rssFallback('ap-content','World News','https://apnews.com'); }
+}
+
+// ── BleepingComputer
+async function fetchBleeping() {
+  try {
+    const xml = await fetchRSSCached('https://www.bleepingcomputer.com/feed/','rss_bleeping',1);
+    renderRSSFeed(xml, 'bleeping-content', 'BleepingComputer', 'bleeping-badge', 7);
+  } catch(e) { rssFallback('bleeping-content','BleepingComputer','https://www.bleepingcomputer.com'); }
+}
+
+// ── Dark Reading
+async function fetchDarkReading() {
+  try {
+    const xml = await fetchRSSCached('https://www.darkreading.com/rss.xml','rss_darkreading',1);
+    renderRSSFeed(xml, 'darkreading-content', 'Dark Reading', 'darkreading-badge', 7);
+  } catch(e) { rssFallback('darkreading-content','Dark Reading','https://www.darkreading.com'); }
+}
+
+// ── Atlas Obscura
+async function fetchAtlas() {
+  try {
+    const xml = await fetchRSSCached('https://www.atlasobscura.com/feeds/latest','rss_atlas',1);
+    renderRSSFeed(xml, 'atlas-content', 'Atlas Obscura', 'atlas-badge', 6);
+  } catch(e) {
+    const fallback = [
+      {t:'The Cave of Crystals, Naica, Mexico',d:'Giant selenite crystals up to 36 feet long, grown over 500,000 years in superheated brine 1,000 feet underground.',u:'https://www.atlasobscura.com/places/cave-of-crystals'},
+      {t:'The Door to Hell, Turkmenistan',d:'A natural gas crater set alight in 1971 to prevent methane spread — and has burned continuously ever since.',u:'https://www.atlasobscura.com/places/darvaza-gas-crater'},
+      {t:'Socotra Island, Yemen',d:'Dragon blood trees and bottle trees found nowhere else on Earth — the "Galápagos of the Indian Ocean."',u:'https://www.atlasobscura.com/places/socotra-island'},
+      {t:'Fly Geyser, Nevada',d:'An accidental technicolor eruption created in 1964 when a geothermal well was improperly capped.',u:'https://www.atlasobscura.com/places/fly-ranch-geyser'},
+      {t:'Salar de Uyuni, Bolivia',d:"The world's largest salt flat — 4,000 square miles that becomes a perfect mirror of the sky when flooded.",u:'https://www.atlasobscura.com/places/salar-de-uyuni'},
+      {t:'Pamukkale Thermal Pools, Turkey',d:'Terraced white calcium pools on a cliffside, fed by hot springs — used as a spa since Roman times.',u:'https://www.atlasobscura.com/places/pamukkale'},
+    ];
+    document.getElementById('atlas-content').innerHTML = fallback.map(f =>
+      `<div class="news-item"><a class="news-title" href="${esc(f.u)}" target="_blank" rel="noopener">${esc(f.t)}</a><div class="news-desc">${esc(f.d)}</div></div>`
+    ).join('');
+  }
+}
+
+// ── Hacker News
+async function fetchHN() {
+  // HN: refresh every hour during the day, cache daily otherwise
+  const ck = `hn_${year}_${month}_${day}_${new Date().getHours()}`;
+  const cached = S(ck);
+  if (cached) { renderHN(JSON.parse(cached)); return; }
+  try {
+    const ids = await fetch('https://hacker-news.firebaseio.com/v0/topstories.json').then(r=>r.json());
+    const stories = await Promise.all(ids.slice(0,8).map(id=>fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`).then(r=>r.json())));
+    const clean = stories.filter(s=>s&&s.title).slice(0,7);
+    SS(ck, JSON.stringify(clean)); renderHN(clean);
+  } catch(e) { document.getElementById('hn-content').innerHTML = '<div class="error-msg">Could not load HN.</div>'; }
+}
+function renderHN(stories) {
+  document.getElementById('hn-content').innerHTML = stories.map((s,i) => `
+    <div class="hn-item">
+      <div class="hn-num">${i+1}</div>
+      <div>
+        <a class="hn-title" href="${esc(s.url || `https://news.ycombinator.com/item?id=${s.id}`)}" target="_blank" rel="noopener">${esc(s.title)}</a>
+        <div class="hn-meta">▲ ${s.score||0} · ${s.descendants||0} comments</div>
+      </div>
+    </div>`).join('') +
+    `<div style="font-family:'DM Mono',monospace;font-size:.58rem;color:var(--muted2);margin-top:10px;padding-top:8px;border-top:1px solid var(--border);text-align:right">
+      Fetched ${new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
+    </div>`;
+  document.getElementById('hn-badge').textContent = new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+}
+
+// ── Launch all RSS feeds on page load
+(function launchAllFeeds() {
+  fetchAPNews();
+  fetchHN();
+  fetchBleeping();
+  fetchDarkReading();
+  fetchAtlas();
+  const el = document.getElementById('feeds-refresh-time');
+  if (el) el.textContent = 'loading now · auto-refreshes hourly';
+  setTimeout(() => {
+    if (el) el.textContent = 'loaded at ' + new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  }, 4000);
+})();
+
+// ═══════════════════════════════════════════════════
+// GITHUB TRENDING
+// ═══════════════════════════════════════════════════
+const langColors = {javascript:'#f1e05a',python:'#3572A5',rust:'#dea584',typescript:'#2b7489',
+  go:'#00ADD8',java:'#b07219','c++':'#f34b7d',c:'#555555',swift:'#ffac45',
+  kotlin:'#A97BFF',ruby:'#701516',php:'#4F5D95',shell:'#89e051',html:'#e34c26',
+  css:'#563d7c',vue:'#41b883',dart:'#00B4AB',r:'#198CE7',scala:'#c22d40'};
+function getLangColor(lang) {
+  if (!lang) return 'var(--muted)';
+  return langColors[lang.toLowerCase()] || 'var(--muted)';
+}
+
+let ghtLang = '', ghtTime = 'today', ghtTopic = '';
+
+function getTrendingDate(since) {
+  const d = new Date();
+  d.setDate(d.getDate() - (since === 'weekly' ? 7 : 1));
+  return d.toISOString().split('T')[0];
+}
+
+async function fetchGHT(lang, time, btn, topic) {
+  ghtLang = lang; ghtTime = time; ghtTopic = topic;
+  if (btn) {
+    if (btn.closest('#gh-lang-tabs')) {
+      document.querySelectorAll('#gh-lang-tabs .map-tab').forEach(b => b.classList.remove('active'));
+    } else if (btn.closest('#gh-time-tabs')) {
+      document.querySelectorAll('#gh-time-tabs .map-tab').forEach(b => b.classList.remove('active'));
+    }
+    btn.classList.add('active');
+  }
+  document.getElementById('gh-content').innerHTML =
+    '<div class="loading-shimmer shimmer-line"></div><div class="loading-shimmer shimmer-line" style="width:85%"></div><div class="loading-shimmer shimmer-line" style="width:70%"></div>';
+
+  const since = time === 'weekly' ? 'weekly' : 'daily';
+  const cacheKey = `ght_${lang||topic||'all'}_${since}_${year}_${month}_${day}`;
+  const cached = S(cacheKey);
+  if (cached) { renderGHT(JSON.parse(cached)); return; }
+
+  try {
+    // GitHub Search API — free, no auth for public repos
+    let q;
+    if (topic) {
+      q = `${topic} pushed:>${getTrendingDate(since)}`;
+    } else if (lang) {
+      q = `language:${lang} pushed:>${getTrendingDate(since)}`;
+    } else {
+      q = `stars:>100 pushed:>${getTrendingDate(since)}`;
+    }
+    const url = `https://api.github.com/search/repositories?q=${encodeURIComponent(q)}&sort=stars&order=desc&per_page=8`;
+    const res = await fetch(url, {headers:{Accept:'application/vnd.github.v3+json'}});
+    if (!res.ok) throw new Error(`${res.status}`);
+    const data = await res.json();
+    const repos = (data.items || []).slice(0, 7);
+    SS(cacheKey, JSON.stringify(repos));
+    renderGHT(repos);
+  } catch(e) {
+    // Fallback: scrape github.com/trending via proxy
+    try {
+      const trendUrl = `https://github.com/trending${lang ? '/'+lang : ''}?since=${since}`;
+      const proxyRes = await fetch(PROXY + encodeURIComponent(trendUrl));
+      const json = await proxyRes.json();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(json.contents, 'text/html');
+      const articles = Array.from(doc.querySelectorAll('article.Box-row')).slice(0, 7);
+      if (!articles.length) throw new Error('no articles');
+      const repos = articles.map(a => {
+        const nameEl = a.querySelector('h2 a');
+        const fullName = (nameEl?.getAttribute('href') || '/').replace(/^\//,'');
+        const [owner, name] = fullName.split('/');
+        const desc = a.querySelector('p')?.textContent?.trim() || '';
+        const langEl = a.querySelector('[itemprop="programmingLanguage"]');
+        const language = langEl?.textContent?.trim() || '';
+        const starsEl = a.querySelector('a[href$="/stargazers"]');
+        const stargazers_count = parseInt((starsEl?.textContent?.trim()||'0').replace(/,/g,'')) || 0;
+        const starsNewEl = a.querySelector('.float-sm-right');
+        const stars_today = starsNewEl?.textContent?.trim().replace('stars today','').trim() || '';
+        return {name, owner:{login:owner}, full_name:fullName, description:desc, language, stargazers_count, stars_today, html_url:`https://github.com/${fullName}`};
+      });
+      SS(cacheKey, JSON.stringify(repos));
+      renderGHT(repos);
+    } catch(e2) {
+      document.getElementById('gh-content').innerHTML =
+        `<div style="text-align:center;padding:14px 0">
+          <div style="font-size:.78rem;color:var(--text2);margin-bottom:10px">GitHub API rate limited. View directly:</div>
+          <a href="https://github.com/trending${lang ? '/'+lang : ''}?since=${since}" target="_blank" rel="noopener" style="font-size:.75rem;color:var(--accent);text-decoration:none">GitHub Trending →</a>
+        </div>`;
+    }
+  }
+}
+
+function setGHTTime(time, btn) {
+  ghtTime = time;
+  document.querySelectorAll('#gh-time-tabs .map-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('gh-badge').textContent = time === 'weekly' ? 'This week' : 'Today';
+  fetchGHT(ghtLang, time, null, ghtTopic);
+}
+
+function renderGHT(repos) {
+  if (!repos || !repos.length) {
+    document.getElementById('gh-content').innerHTML = '<div class="error-msg">No results found.</div>';
+    return;
+  }
+  document.getElementById('gh-content').innerHTML = repos.map(r => {
+    const owner = r.owner?.login || '';
+    const name = r.name || '';
+    const desc = r.description || '';
+    const lang = r.language || '';
+    const stars = (r.stargazers_count || 0).toLocaleString();
+    const forks = (r.forks_count || 0).toLocaleString();
+    const starsNew = r.stars_today || '';
+    const url = r.html_url || `https://github.com/${r.full_name || owner+'/'+name}`;
+    return `<div class="gh-repo">
+      <div class="gh-repo-owner">${esc(owner)}</div>
+      <a class="gh-repo-name" href="${esc(url)}" target="_blank" rel="noopener">
+        ${lang ? `<span class="gh-lang-dot" style="background:${getLangColor(lang)}"></span>` : ''}
+        ${esc(name)}
+      </a>
+      ${desc ? `<div class="gh-repo-desc">${esc(desc.slice(0,120))}${desc.length > 120 ? '…' : ''}</div>` : ''}
+      <div class="gh-repo-meta">
+        <span>⭐ ${stars}</span>
+        ${forks !== '0' ? `<span>🍴 ${forks}</span>` : ''}
+        ${lang ? `<span>${esc(lang)}</span>` : ''}
+        ${starsNew ? `<span class="gh-stars-new">+${esc(starsNew)} today</span>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// Load GitHub Trending on page open
+fetchGHT('', 'today', null, '');
+
 </script>
 </body>
 </html>
