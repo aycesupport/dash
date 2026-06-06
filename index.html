@@ -628,6 +628,109 @@
   .zoo-fact-label { color:var(--muted); font-size:.65rem; text-transform:uppercase; letter-spacing:1px; }
   .zoo-fact-val { color:var(--text2); text-align:right; max-width:60%; }
 
+
+  /* ── DRAG & DROP LAYOUT ── */
+  #drag-canvas { display:flex; flex-direction:column; gap:0; }
+
+  .drag-row-wrapper {
+    position: relative;
+    transition: opacity 0.2s;
+  }
+  .drag-row-wrapper.dragging {
+    opacity: 0.4;
+    cursor: grabbing;
+  }
+  .drag-row-wrapper.drag-over {
+    border-top: 2px solid var(--accent);
+  }
+  .drag-row-wrapper.drag-over-bottom {
+    border-bottom: 2px solid var(--accent);
+  }
+
+  /* Drag handle — appears on hover at the left edge of each row */
+  .drag-handle {
+    position: absolute;
+    left: -22px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    opacity: 0;
+    transition: opacity 0.2s;
+    color: var(--muted2);
+    font-size: 14px;
+    user-select: none;
+    border-radius: 4px;
+    z-index: 10;
+  }
+  .drag-handle:hover { color: var(--accent); }
+  .drag-row-wrapper:hover .drag-handle { opacity: 1; }
+  .drag-handle:active { cursor: grabbing; }
+
+  /* Row label badge */
+  .row-label-badge {
+    position: absolute;
+    right: 0;
+    top: -10px;
+    font-family: 'DM Mono', monospace;
+    font-size: .5rem;
+    color: var(--muted2);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+  .drag-row-wrapper:hover .row-label-badge { opacity: 1; }
+
+  /* Drag toolbar */
+  #drag-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0 20px;
+    font-family: 'DM Mono', monospace;
+    font-size: .62rem;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+  #drag-toolbar .drag-toolbar-hint {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+  }
+  #drag-toolbar .drag-toolbar-hint:hover { opacity: 1; }
+  .drag-reset-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 3px 10px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: .58rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 1px;
+  }
+  .drag-reset-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* Hide handles on mobile — too small to drag */
+  @media (max-width: 768px) {
+    .drag-handle { display: none; }
+    .row-label-badge { display: none; }
+    #drag-toolbar { display: none; }
+    .drag-row-wrapper { padding-left: 0 !important; }
+  }
+
 </style>
 </head>
 <body>
@@ -650,6 +753,17 @@
   </div>
 </header>
 
+<div id="drag-toolbar">
+  <span class="drag-toolbar-hint">
+    <span style="font-size:.8rem">⠿</span> Drag rows to rearrange
+  </span>
+  <button class="drag-reset-btn" onclick="resetDragLayout()">↺ Reset layout</button>
+  <span id="drag-save-indicator" style="color:var(--accent3);opacity:0;transition:opacity .5s"></span>
+</div>
+
+<div id="drag-canvas">
+
+
 <!-- ══════════════════════════════════════════════════ -->
 <!-- SECTION 1 — NEWS FEEDS (loaded on page open)      -->
 <!-- ══════════════════════════════════════════════════ -->
@@ -658,7 +772,7 @@
 </div>
 
 <!-- ROW: 4 news columns -->
-<div class="grid-row col-4" style="margin-bottom:20px">
+<div class="grid-row col-4" data-row-id="row-news-feeds" style="margin-bottom:20px">
 
   <div class="panel">
     <div class="panel-head"><div class="panel-icon ir">📰</div><span class="panel-title">World News</span><span class="panel-badge" id="ap-badge">—</span></div>
@@ -707,7 +821,7 @@
 </div>
 
 <!-- ROW: Atlas Obscura + GitHub Trending -->
-<div class="grid-row col-2" style="margin-bottom:28px">
+<div class="grid-row col-2" data-row-id="row-atlas-github" style="margin-bottom:28px">
 
   <div class="panel">
     <div class="panel-head"><div class="panel-icon io">🗺️</div><span class="panel-title">Atlas Obscura · Curious Places</span><span class="panel-badge" id="atlas-badge">—</span></div>
@@ -763,7 +877,7 @@
 </div>
 
 <!-- ══ ROW 2: NASA EARTH + SMITHSONIAN ══ -->
-<div class="grid-row col-2">
+<div class="grid-row col-2" data-row-id="row-apod-history">
   <div class="panel">
     <div class="panel-head"><div class="panel-icon ib">🌍</div><span class="panel-title">NASA Earth Observatory · Image of the Day</span><span class="panel-badge" id="earth-date-badge">—</span></div>
     <div class="panel-body" id="earth-content"><div class="loading-shimmer shimmer-block"></div></div>
@@ -775,7 +889,7 @@
 </div>
 
 <!-- ══ ROW 3: WORD + COLOR + FALLACY ══ -->
-<div class="grid-row col-3">
+<div class="grid-row col-3" data-row-id="row-earth-smithsonian">
   <div class="panel">
     <div class="panel-head"><div class="panel-icon ip">📖</div><span class="panel-title">Word of the Day</span></div>
     <div class="panel-body" id="word-content"><div class="loading-shimmer shimmer-line" style="height:30px;width:50%;margin-bottom:14px"></div><div class="loading-shimmer shimmer-line" style="width:30%"></div><div class="loading-shimmer shimmer-line"></div></div>
@@ -791,7 +905,7 @@
 </div>
 
 <!-- ══ ROW 4: COUNTRY + ISS + AQI ══ -->
-<div class="grid-row col-3">
+<div class="grid-row col-3" data-row-id="row-word-color-fallacy">
   <div class="panel">
     <div class="panel-head"><div class="panel-icon ib">🌍</div><span class="panel-title">Country Spotlight</span></div>
     <div class="panel-body" id="country-content"><div class="loading-shimmer shimmer-line" style="height:40px;width:40%;margin-bottom:10px"></div><div class="loading-shimmer shimmer-line" style="width:60%"></div><div class="loading-shimmer shimmer-line"></div></div>
@@ -807,7 +921,7 @@
 </div>
 
 <!-- ══ ROW 7: WINDY + MARINE TRAFFIC ══ -->
-<div class="grid-row col-2">
+<div class="grid-row col-2" data-row-id="row-country-iss-aqi">
   <div class="panel">
     <div class="panel-head"><div class="panel-icon ib">🌬️</div><span class="panel-title">Windy · Live Wind &amp; Weather Map</span></div>
     <div class="panel-body" style="padding:14px">
@@ -840,7 +954,7 @@
 </div>
 
 <!-- ══ ROW 8: SUNRISE + AMBIENT + QUICK LINKS ══ -->
-<div class="grid-row col-3">
+<div class="grid-row col-3" data-row-id="row-windy-marine">
   <div class="panel">
     <div class="panel-head"><div class="panel-icon ig">☀️</div><span class="panel-title">Sun · Rise &amp; Set</span><span class="panel-badge" id="sun-location-badge">—</span></div>
     <div class="panel-body" id="sun-content"><div class="loading-shimmer shimmer-line" style="height:60px"></div></div>
@@ -875,7 +989,7 @@
 </div>
 
 <!-- ══ ROW 11: SUBREDDIT TOP POST ══ -->
-<div class="grid-row col-3">
+<div class="grid-row col-3" data-row-id="row-sun-ambient-links">
   <div class="panel">
     <div class="panel-head"><div class="panel-icon ir">👾</div><span class="panel-title">Subreddit · Top Post</span></div>
     <div class="panel-body">
@@ -907,7 +1021,7 @@
 </div>
 
 <!-- ══ ROW 12: CYBER SECURITY ══ -->
-<div class="grid-row col-3">
+<div class="grid-row col-3" data-row-id="row-subreddit-bored-loc">
     </div>
   <div class="panel">
     <div class="panel-head"><div class="panel-icon ir">⚠️</div><span class="panel-title">CISA · Known Exploited Vulnerabilities</span><span class="panel-badge" id="cisa-badge">—</span></div>
@@ -928,7 +1042,7 @@
 </div>
 
 <!-- ══ ROW 14: LOCAL EVENTS ══ -->
-<div class="grid-row" style="grid-template-columns:1fr">
+<div class="grid-row" data-row-id="row-local-events" style="grid-template-columns:1fr">
   <div class="panel">
     <div class="panel-head"><div class="panel-icon it">📍</div><span class="panel-title">Local Events · Nearby This Week</span><span class="panel-badge" id="events-location-badge">—</span></div>
     <div class="panel-body">
@@ -959,7 +1073,7 @@
 <!-- ══════════════════════════════════════════════════ -->
 
 <!-- ROW: Markets (full width) -->
-<div class="grid-row" style="margin-bottom:20px">
+<div class="grid-row" data-row-id="row-markets" style="margin-bottom:20px">
   <div class="panel">
     <div class="panel-head">
       <div class="panel-icon ig">📈</div>
@@ -982,7 +1096,7 @@
 </div>
 
 <!-- ROW: Shodan + HIBP + Wolfram -->
-<div class="grid-row col-3" style="margin-bottom:28px">
+<div class="grid-row col-3" data-row-id="row-shodan-hibp-wolfram" style="margin-bottom:28px">
 
   <!-- Shodan InternetDB -->
   <div class="panel">
@@ -1055,7 +1169,7 @@
 <!-- ══════════════════════════════════════════════════ -->
 <!-- SECTION 8 — DAILY RECIPE                          -->
 <!-- ══════════════════════════════════════════════════ -->
-<div class="grid-row" style="margin-bottom:28px">
+<div class="grid-row" data-row-id="row-recipe" style="margin-bottom:28px">
   <div class="panel">
     <div class="panel-head">
       <div class="panel-icon io">🍽️</div>
@@ -1088,7 +1202,7 @@
 <!-- ══════════════════════════════════════════════════ -->
 
 <!-- ROW: API Ninjas + URLScan + Zoo Animal -->
-<div class="grid-row col-3" style="margin-bottom:28px">
+<div class="grid-row col-3" data-row-id="row-api-zoo-urlscan" style="margin-bottom:28px">
 
   <!-- API Ninjas — Trivia / Facts / Riddles / Jokes -->
   <div class="panel">
@@ -1153,6 +1267,8 @@
 </div>
 <!-- ══ END SECTION 9 ══ -->
 
+
+</div><!-- /drag-canvas -->
 <div class="footer" id="footer-ts">DAILY DISCOVERY DASHBOARD · UPDATED ON LOAD</div>
 </div>
 
@@ -1719,25 +1835,34 @@ async function fetchNumberFact(n) {
   if (cached) { renderNumberFact(cached); return; }
   // Try date fact first (month/day), then trivia about the day-of-year number
   const urls = [
-    `http://numbersapi.com/${month}/${day}/date?json`,
-    `http://numbersapi.com/${n}/trivia?json`,
+    `https://numbersapi.com/${month}/${day}/date?json`,
+    `https://numbersapi.com/${n}/trivia?json`,
+    `https://numbersapi.com/${n}/math?json`,
+  ];
+  const allProxies = [
+    {url: MY_RSS_PROXY, wrap: false},
+    {url: PROXY,        wrap: true },
+    {url: PROXY2,       wrap: false},
   ];
   for (const url of urls) {
-    try {
-      // Route through our CF Worker since numbersapi.com has CORS restrictions
-      const proxied = await fetch(MY_RSS_PROXY + encodeURIComponent(url), {signal: AbortSignal.timeout(6000)});
-      if (!proxied.ok) continue;
-      const text = await proxied.text();
-      let data;
-      try { data = JSON.parse(text); } catch(e) {
-        try { data = JSON.parse(JSON.parse(text).contents); } catch(e2) { continue; }
-      }
-      if (data?.text) {
-        SS(ck, data.text);
-        renderNumberFact(data.text);
-        return;
-      }
-    } catch(e) { continue; }
+    for (const proxy of allProxies) {
+      try {
+        const proxied = await fetch(proxy.url + encodeURIComponent(url), {signal: AbortSignal.timeout(6000)});
+        if (!proxied.ok) continue;
+        const text = await proxied.text();
+        let data;
+        if (proxy.wrap) {
+          try { data = JSON.parse(JSON.parse(text).contents); } catch(e) { continue; }
+        } else {
+          try { data = JSON.parse(text); } catch(e) { continue; }
+        }
+        if (data?.text) {
+          SS(ck, data.text);
+          renderNumberFact(data.text);
+          return;
+        }
+      } catch(e) { continue; }
+    }
   }
   // If API fails just keep the plain counter (already set above)
 }
@@ -2048,7 +2173,17 @@ async function fetchNewspaper() {
   if (cached) { renderNewspaper(JSON.parse(cached)); return; }
   try {
     const mm = String(month).padStart(2,'0'), dd = String(day).padStart(2,'0');
-    const d  = await fetch(`https://chroniclingamerica.loc.gov/search/pages/results/?dateFilterType=range&date1=${pickedYear}-${mm}-${dd}&date2=${pickedYear}-${mm}-${dd}&sequence=1&rows=5&format=json`).then(r=>r.json());
+    // Route through CF Worker — chroniclingamerica.loc.gov blocks direct browser CORS
+    const chronicleUrl = `https://chroniclingamerica.loc.gov/search/pages/results/?dateFilterType=range&date1=${pickedYear}-${mm}-${dd}&date2=${pickedYear}-${mm}-${dd}&sequence=1&rows=5&format=json`;
+    let d;
+    try {
+      const r = await fetch(MY_RSS_PROXY + encodeURIComponent(chronicleUrl), {signal: AbortSignal.timeout(8000)});
+      const text = await r.text();
+      try { d = JSON.parse(text); } catch(e) { d = JSON.parse(JSON.parse(text).contents); }
+    } catch(e) {
+      const r2 = await fetch(chronicleUrl, {signal: AbortSignal.timeout(5000)});
+      d = await r2.json();
+    }
     const items = (d.items||[]).filter(i=>i.title&&i.url);
     if (!items.length) throw new Error();
     const item = items[0];
@@ -2056,7 +2191,7 @@ async function fetchNewspaper() {
     SS(ck, JSON.stringify(obj)); renderNewspaper(obj);
   } catch(e) {
     const mm = String(month).padStart(2,'0'), dd = String(day).padStart(2,'0');
-    document.getElementById('newspaper-content').innerHTML = `
+    const _npEl2 = document.getElementById('newspaper-content'); if (_npEl2) _npEl2.innerHTML = `
       <div style="background:var(--surface2);border-radius:10px;border:1px solid var(--border);padding:16px;margin-bottom:10px;font-family:'Cormorant Garamond',serif;color:var(--muted);font-size:.85rem;line-height:1.7;font-style:italic">
         A front page from ${pickedYear} — the world as it was printed on this day ${year-pickedYear} years ago.
       </div>
@@ -2064,9 +2199,11 @@ async function fetchNewspaper() {
   }
 }
 function renderNewspaper(obj) {
+  const npEl = document.getElementById('newspaper-content');
+  if (!npEl) return;
   const fd = obj.date ? new Date(obj.date+'T12:00:00').toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}) : pickedYear;
   const mm = String(month).padStart(2,'0'), dd = String(day).padStart(2,'0');
-  document.getElementById('newspaper-content').innerHTML = `
+  npEl.innerHTML = `
     <div class="newspaper-dateline">${fd}${obj.city?' · '+esc(obj.city):''}${obj.state?' · '+esc(obj.state):''}</div>
     <div class="newspaper-headline">${esc(obj.title)}</div>
     <div style="background:var(--surface2);border-radius:10px;border:1px solid var(--border);padding:14px;margin-top:10px;font-family:'Cormorant Garamond',serif;color:var(--muted);font-size:.85rem;line-height:1.7;font-style:italic">
@@ -2092,15 +2229,16 @@ async function fetchSubreddit(sub, btn) {
 
     // Reddit endpoints to try in order
     const endpoints = [
-      `https://www.reddit.com/r/${sub}/top.json?limit=3&t=day`,
-      `https://old.reddit.com/r/${sub}/top.json?limit=3&t=day`,
+      `https://www.reddit.com/r/${sub}/top.json?limit=3&t=day&raw_json=1`,
+      `https://old.reddit.com/r/${sub}/top.json?limit=3&t=day&raw_json=1`,
+      `https://api.reddit.com/r/${sub}/top?limit=3&t=day`,
     ];
 
     // Proxies to try for each endpoint
     const proxies = [
-      { url: MY_RSS_PROXY, wrap: false },  // CF Worker — raw JSON
-      { url: PROXY,        wrap: true  },  // allorigins — {contents: "..."}
-      { url: PROXY2,       wrap: false },  // corsproxy — raw
+      { url: MY_RSS_PROXY, wrap: false },  // CF Worker — raw JSON (best — server-side)
+      { url: PROXY,        wrap: true  },  // allorigins
+      { url: PROXY2,       wrap: false },  // corsproxy
     ];
 
     outer:
@@ -2108,8 +2246,13 @@ async function fetchSubreddit(sub, btn) {
       // 1. Try direct browser fetch first
       try {
         const r = await fetch(endpoint, {
-          headers:{ Accept:'application/json', 'User-Agent':'Mozilla/5.0' },
-          signal: AbortSignal.timeout(5000)
+          headers:{
+            'Accept': 'application/json',
+            'User-Agent': 'Mozilla/5.0 (compatible; DashboardBot/1.0)',
+          },
+          signal: AbortSignal.timeout(5000),
+          mode: 'cors',
+          credentials: 'omit',
         });
         if (r.ok) { d = await r.json(); if (d?.data?.children?.length) break outer; }
       } catch(e) {}
@@ -2176,8 +2319,10 @@ async function fetchWikipedia() {
   } catch(e) { document.getElementById('wiki-content').innerHTML = '<div class="error-msg">Could not load Wikipedia featured article.</div>'; }
 }
 function renderWikipedia(a) {
+  const el = document.getElementById('wiki-content');
+  if (!el) return;
   const thumb = a.thumb ? `<img src="${esc(a.thumb)}" alt="${esc(a.title)}" loading="lazy" onerror="this.style.display='none'" style="float:right;max-width:120px;max-height:120px;object-fit:cover;border-radius:8px;margin:0 0 10px 14px;border:1px solid var(--border)">` : '';
-  document.getElementById('wiki-content').innerHTML = `
+  el.innerHTML = `
     <div style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:400;color:var(--text);margin-bottom:10px;line-height:1.2">${esc(a.title.replace(/_/g,' '))}</div>
     <div id="wiki-expl" style="font-size:.8rem;color:var(--text2);line-height:1.75;max-height:160px;overflow:hidden;position:relative;transition:max-height .4s ease">${thumb}${esc(a.extract)}</div>
     <button class="btn-expand" onclick="const el=document.getElementById('wiki-expl');if(el.style.maxHeight==='160px'||!el.style.maxHeight){el.style.maxHeight='2000px';this.textContent='Show less ↑';}else{el.style.maxHeight='160px';this.textContent='Read more ↓';}">Read more ↓</button>
@@ -2191,7 +2336,25 @@ fetchWikipedia();
 async function fetchBored() {
   document.getElementById('bored-content').innerHTML = '<div class="loading-shimmer shimmer-line" style="height:26px;width:80%;margin-bottom:12px"></div>';
   try {
-    const d = await fetch('https://bored-api.appbrewery.com/random').then(r=>r.json());
+    // bored-api blocks CORS — try direct, then all proxies
+    let d;
+    const boredUrl = 'https://bored-api.appbrewery.com/random';
+    let fetched = false;
+    for (const proxy of [{url:'', wrap:false}, {url:MY_RSS_PROXY, wrap:false}, {url:PROXY, wrap:true}, {url:PROXY2, wrap:false}]) {
+      try {
+        const fetchUrl = proxy.url ? proxy.url + encodeURIComponent(boredUrl) : boredUrl;
+        const r    = await fetch(fetchUrl, {signal: AbortSignal.timeout(6000)});
+        if (!r.ok) continue;
+        const text = await r.text();
+        if (proxy.wrap) {
+          d = JSON.parse(JSON.parse(text).contents);
+        } else {
+          d = JSON.parse(text);
+        }
+        if (d?.activity) { fetched = true; break; }
+      } catch(e) { continue; }
+    }
+    if (!fetched || !d?.activity) throw new Error('all failed');
     renderBored(d);
   } catch(e) {
     const acts = [
@@ -3508,6 +3671,214 @@ function renderZooAnimal(a) {
 }
 
 fetchZooAnimal();
+
+
+// ═══════════════════════════════════════════════════
+// DRAG & DROP ROW REORDERING
+// ═══════════════════════════════════════════════════
+const DRAG_STORAGE_KEY = 'dash_row_order';
+const ROW_LABELS = {
+  'row-news-feeds':          'News Feeds',
+  'row-atlas-github':        'Atlas + GitHub',
+  'row-apod-history':        'APOD + History',
+  'row-earth-smithsonian':   'Earth Obs + Smithsonian',
+  'row-word-color-fallacy':  'Word · Color · Fallacy',
+  'row-country-iss-aqi':     'Country · ISS · AQI',
+  'row-windy-marine':        'Windy + Marine Traffic',
+  'row-sun-ambient-links':   'Sun · Ambient · Links',
+  'row-subreddit-bored-loc': 'Reddit · Bored · LOC Photo',
+  'row-local-events':        'Local Events',
+  'row-markets':             'Markets',
+  'row-shodan-hibp-wolfram': 'Shodan · HIBP · Wolfram',
+  'row-recipe':              'Daily Recipe',
+  'row-api-zoo-urlscan':     'API Ninjas · URLScan · Zoo',
+};
+
+let dragSrcEl = null;
+let dragSrcId = null;
+
+function initDragLayout() {
+  const canvas = document.getElementById('drag-canvas');
+  if (!canvas) return;
+
+  // Get all direct grid-row children
+  const rows = Array.from(canvas.querySelectorAll('[data-row-id]'));
+
+  // ── Wrap each grid-row in a .drag-row-wrapper
+  rows.forEach(row => {
+    const rowId = row.dataset.rowId;
+
+    // Create wrapper
+    const wrapper = document.createElement('div');
+    wrapper.className = 'drag-row-wrapper';
+    wrapper.dataset.rowId = rowId;
+    wrapper.draggable = true;
+    wrapper.style.position = 'relative';
+    wrapper.style.paddingLeft = '0';
+
+    // Create drag handle
+    const handle = document.createElement('div');
+    handle.className = 'drag-handle';
+    handle.innerHTML = '⠿';
+    handle.title = 'Drag to reorder';
+
+    // Create label badge
+    const label = document.createElement('div');
+    label.className = 'row-label-badge';
+    label.textContent = ROW_LABELS[rowId] || rowId;
+
+    // Insert wrapper before row, move row inside
+    row.parentNode.insertBefore(wrapper, row);
+    wrapper.appendChild(handle);
+    wrapper.appendChild(label);
+    wrapper.appendChild(row);
+
+    // ── Drag events
+    wrapper.addEventListener('dragstart', onDragStart);
+    wrapper.addEventListener('dragend',   onDragEnd);
+    wrapper.addEventListener('dragover',  onDragOver);
+    wrapper.addEventListener('dragleave', onDragLeave);
+    wrapper.addEventListener('drop',      onDrop);
+
+    // Handle controls drag initiation
+    handle.addEventListener('mousedown', () => { wrapper.draggable = true; });
+  });
+
+  // Apply saved order
+  applySavedOrder();
+}
+
+function onDragStart(e) {
+  dragSrcEl = this;
+  dragSrcId = this.dataset.rowId;
+  this.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', dragSrcId);
+}
+
+function onDragEnd(e) {
+  this.classList.remove('dragging');
+  document.querySelectorAll('.drag-row-wrapper').forEach(el => {
+    el.classList.remove('drag-over', 'drag-over-bottom');
+  });
+  dragSrcEl = null;
+  dragSrcId = null;
+}
+
+function onDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  if (this === dragSrcEl) return;
+
+  // Determine if dragging over top or bottom half
+  const rect   = this.getBoundingClientRect();
+  const midY   = rect.top + rect.height / 2;
+  const isTop  = e.clientY < midY;
+
+  document.querySelectorAll('.drag-row-wrapper').forEach(el => {
+    el.classList.remove('drag-over', 'drag-over-bottom');
+  });
+  this.classList.add(isTop ? 'drag-over' : 'drag-over-bottom');
+}
+
+function onDragLeave(e) {
+  this.classList.remove('drag-over', 'drag-over-bottom');
+}
+
+function onDrop(e) {
+  e.preventDefault();
+  e.stopPropagation();
+
+  if (!dragSrcEl || this === dragSrcEl) return;
+
+  const canvas    = document.getElementById('drag-canvas');
+  const wrappers  = Array.from(canvas.querySelectorAll('.drag-row-wrapper'));
+  const srcIdx    = wrappers.indexOf(dragSrcEl);
+  const tgtIdx    = wrappers.indexOf(this);
+
+  // Determine insert position
+  const rect  = this.getBoundingClientRect();
+  const isTop = e.clientY < rect.top + rect.height / 2;
+
+  this.classList.remove('drag-over', 'drag-over-bottom');
+
+  if (srcIdx === tgtIdx) return;
+
+  // Move the element
+  if (isTop) {
+    canvas.insertBefore(dragSrcEl, this);
+  } else {
+    canvas.insertBefore(dragSrcEl, this.nextSibling);
+  }
+
+  // Save the new order
+  saveDragOrder();
+  showSaveIndicator();
+}
+
+function saveDragOrder() {
+  const canvas   = document.getElementById('drag-canvas');
+  const wrappers = Array.from(canvas.querySelectorAll('.drag-row-wrapper'));
+  const order    = wrappers.map(w => w.dataset.rowId);
+  SS(DRAG_STORAGE_KEY, JSON.stringify(order));
+}
+
+function applySavedOrder() {
+  const saved = S(DRAG_STORAGE_KEY);
+  if (!saved) return;
+
+  let order;
+  try { order = JSON.parse(saved); } catch(e) { return; }
+
+  const canvas = document.getElementById('drag-canvas');
+
+  // Build a map of rowId -> wrapper element
+  const wrapperMap = {};
+  canvas.querySelectorAll('.drag-row-wrapper').forEach(w => {
+    wrapperMap[w.dataset.rowId] = w;
+  });
+
+  // Re-append in saved order (new rows not in saved order go at end)
+  const allIds = Object.keys(wrapperMap);
+  const orderedIds   = order.filter(id => wrapperMap[id]); // saved ids that exist
+  const remainingIds = allIds.filter(id => !orderedIds.includes(id)); // new rows added since last save
+  const finalOrder   = [...orderedIds, ...remainingIds];
+
+  finalOrder.forEach(id => {
+    if (wrapperMap[id]) canvas.appendChild(wrapperMap[id]);
+  });
+}
+
+function resetDragLayout() {
+  localStorage.removeItem(DRAG_STORAGE_KEY);
+
+  // Re-sort to default (by data-row-id DOM order = original HTML order)
+  const defaultOrder = Object.keys(ROW_LABELS);
+  const canvas = document.getElementById('drag-canvas');
+  const wrapperMap = {};
+  canvas.querySelectorAll('.drag-row-wrapper').forEach(w => {
+    wrapperMap[w.dataset.rowId] = w;
+  });
+  defaultOrder.forEach(id => {
+    if (wrapperMap[id]) canvas.appendChild(wrapperMap[id]);
+  });
+
+  showSaveIndicator('Layout reset');
+}
+
+function showSaveIndicator(msg = 'Layout saved ✓') {
+  const el = document.getElementById('drag-save-indicator');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.opacity = '1';
+  setTimeout(() => { el.style.opacity = '0'; }, 2000);
+}
+
+// Init after DOM is ready (all panels are rendered)
+// Use requestAnimationFrame to ensure DOM is fully painted first
+requestAnimationFrame(() => {
+  setTimeout(initDragLayout, 100);
+});
 
 // ═══════════════════════════════════════════════════
 // FOOTER
