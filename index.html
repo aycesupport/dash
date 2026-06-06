@@ -584,6 +584,50 @@
     #recipe-content { grid-template-columns: 1fr; }
   }
 
+
+  /* ── API NINJAS / TRIVIA / FACTS ── */
+  .ninja-panel-tabs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; }
+  .ninja-result { display:flex; flex-direction:column; gap:10px; }
+  .ninja-fact-big { font-family:'Cormorant Garamond',serif; font-size:1.4rem; color:var(--text); line-height:1.5; margin-bottom:8px; }
+  .ninja-fact-meta { font-family:'DM Mono',monospace; font-size:.65rem; color:var(--muted); letter-spacing:1px; }
+  .ninja-trivia-q { font-family:'Cormorant Garamond',serif; font-size:1.15rem; color:var(--text); line-height:1.5; margin-bottom:12px; }
+  .ninja-trivia-opts { display:flex; flex-direction:column; gap:6px; margin-bottom:10px; }
+  .ninja-opt { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:9px 14px; cursor:pointer; font-size:.8rem; color:var(--text2); transition:all .15s; text-align:left; font-family:'Outfit',sans-serif; }
+  .ninja-opt:hover { border-color:var(--border2); color:var(--text); }
+  .ninja-opt.correct { border-color:var(--accent3); background:rgba(92,184,159,.12); color:var(--accent3); }
+  .ninja-opt.wrong   { border-color:var(--accent4); background:rgba(192,89,110,.08); color:var(--accent4); }
+  .ninja-opt:disabled { cursor:default; }
+  .ninja-riddle-q { font-family:'Cormorant Garamond',serif; font-size:1.2rem; color:var(--text); line-height:1.5; font-style:italic; margin-bottom:12px; }
+  .ninja-riddle-reveal { background:none; border:1px dashed var(--border2); border-radius:8px; padding:9px 14px; color:var(--accent); font-size:.78rem; cursor:pointer; font-family:'Outfit',sans-serif; transition:all .2s; width:100%; text-align:left; }
+  .ninja-riddle-reveal:hover { border-color:var(--accent); }
+  .ninja-joke-setup { font-family:'Cormorant Garamond',serif; font-size:1.1rem; color:var(--text); line-height:1.5; margin-bottom:8px; }
+  .ninja-joke-punchline { font-family:'Cormorant Garamond',serif; font-size:1rem; color:var(--accent); font-style:italic; margin-top:8px; display:none; }
+  .ninja-refresh { font-size:.68rem; color:var(--muted); cursor:pointer; background:none; border:none; font-family:'Outfit',sans-serif; font-weight:500; letter-spacing:1px; text-transform:uppercase; padding:0; transition:opacity .2s; margin-top:10px; display:block; }
+  .ninja-refresh:hover { opacity:.7; color:var(--accent); }
+  .ninja-cat-badge { font-family:'DM Mono',monospace; font-size:.6rem; background:rgba(124,110,170,.1); border:1px solid rgba(124,110,170,.2); border-radius:20px; padding:2px 9px; color:var(--accent2); }
+
+  /* ── URLSCAN ── */
+  .urlscan-input-row { display:flex; gap:8px; margin-bottom:14px; }
+  .urlscan-result { }
+  .urlscan-screenshot { width:100%; border-radius:10px; border:1px solid var(--border); display:block; margin-bottom:12px; max-height:200px; object-fit:cover; }
+  .urlscan-score { font-family:'Cormorant Garamond',serif; font-size:3rem; font-weight:300; line-height:1; margin-bottom:4px; }
+  .urlscan-verdict { font-size:.85rem; font-weight:500; margin-bottom:8px; }
+  .urlscan-detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px; }
+  .urlscan-tags { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:10px; }
+  .urlscan-tag { font-size:.65rem; background:rgba(192,89,110,.08); border:1px solid rgba(192,89,110,.2); border-radius:20px; padding:2px 9px; color:var(--accent4); font-family:'DM Mono',monospace; }
+  .urlscan-tag.safe { background:rgba(92,184,159,.08); border-color:rgba(92,184,159,.2); color:var(--accent3); }
+  .urlscan-submit-note { font-size:.72rem; color:var(--muted); line-height:1.6; font-style:italic; margin-top:8px; }
+
+  /* ── ZOO ANIMAL ── */
+  .zoo-img { width:100%; height:180px; object-fit:cover; border-radius:10px; border:1px solid var(--border); margin-bottom:12px; display:block; }
+  .zoo-name { font-family:'Cormorant Garamond',serif; font-size:1.7rem; font-weight:400; color:var(--text); line-height:1.1; margin-bottom:2px; }
+  .zoo-latin { font-family:'DM Mono',monospace; font-size:.68rem; color:var(--muted); font-style:italic; margin-bottom:10px; }
+  .zoo-facts { display:flex; flex-direction:column; gap:6px; }
+  .zoo-fact { display:flex; justify-content:space-between; align-items:baseline; font-size:.77rem; padding-bottom:6px; border-bottom:1px solid var(--border); }
+  .zoo-fact:last-child { border-bottom:none; padding-bottom:0; }
+  .zoo-fact-label { color:var(--muted); font-size:.65rem; text-transform:uppercase; letter-spacing:1px; }
+  .zoo-fact-val { color:var(--text2); text-align:right; max-width:60%; }
+
 </style>
 </head>
 <body>
@@ -1037,6 +1081,77 @@
   </div>
 </div>
 <!-- ══ END SECTION 8 ══ -->
+
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SECTION 9 — DISCOVERY TOOLS                       -->
+<!-- ══════════════════════════════════════════════════ -->
+
+<!-- ROW: API Ninjas + URLScan + Zoo Animal -->
+<div class="grid-row col-3" style="margin-bottom:28px">
+
+  <!-- API Ninjas — Trivia / Facts / Riddles / Jokes -->
+  <div class="panel">
+    <div class="panel-head">
+      <div class="panel-icon ip">🥷</div>
+      <span class="panel-title">API Ninjas · Daily Dose</span>
+      <span class="panel-badge" id="ninja-mode-badge">Trivia</span>
+    </div>
+    <div class="panel-body">
+      <div class="ninja-panel-tabs" id="ninja-tabs">
+        <button class="map-tab active" onclick="loadNinja('trivia',this)">🎯 Trivia</button>
+        <button class="map-tab" onclick="loadNinja('facts',this)">💡 Facts</button>
+        <button class="map-tab" onclick="loadNinja('riddles',this)">🤔 Riddles</button>
+        <button class="map-tab" onclick="loadNinja('jokes',this)">😄 Jokes</button>
+        <button class="map-tab" onclick="loadNinja('quotes',this)">💬 Quotes</button>
+      </div>
+      <div id="ninja-content">
+        <div class="loading-shimmer shimmer-line" style="height:22px;width:80%;margin-bottom:10px"></div>
+        <div class="loading-shimmer shimmer-line"></div>
+        <div class="loading-shimmer shimmer-line" style="width:85%"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- URLScan.io -->
+  <div class="panel">
+    <div class="panel-head">
+      <div class="panel-icon ir">🔎</div>
+      <span class="panel-title">URLScan.io · URL Analysis</span>
+    </div>
+    <div class="panel-body">
+      <div class="urlscan-input-row">
+        <input id="urlscanInput" class="city-input" placeholder="https://example.com" onkeydown="if(event.key==='Enter')runURLScan()">
+        <button class="btn-fetch" onclick="runURLScan()">Scan</button>
+      </div>
+      <div id="urlscan-result">
+        <div class="wolfram-hint">Submit any URL to scan for malware, phishing, tracking, and security threats. URLScan.io crawls the page, takes a screenshot, and returns a full threat report. Scans are public.</div>
+        <div class="wolfram-examples" style="margin-top:10px">
+          <span class="wolfram-ex" onclick="document.getElementById('urlscanInput').value=this.textContent;runURLScan()">https://google.com</span>
+          <span class="wolfram-ex" onclick="document.getElementById('urlscanInput').value=this.textContent;runURLScan()">https://github.com</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Zoo Animal of the Day -->
+  <div class="panel">
+    <div class="panel-head">
+      <div class="panel-icon it">🦁</div>
+      <span class="panel-title">Zoo Animal · Daily Spotlight</span>
+      <span class="panel-badge" id="zoo-badge">—</span>
+    </div>
+    <div class="panel-body" id="zoo-content">
+      <div class="loading-shimmer" style="height:180px;border-radius:10px;margin-bottom:12px"></div>
+      <div class="loading-shimmer shimmer-line" style="height:22px;width:60%;margin-bottom:8px"></div>
+      <div class="loading-shimmer shimmer-line" style="width:40%;margin-bottom:10px"></div>
+      <div class="loading-shimmer shimmer-line"></div>
+      <div class="loading-shimmer shimmer-line" style="width:85%"></div>
+    </div>
+  </div>
+
+</div>
+<!-- ══ END SECTION 9 ══ -->
 
 <div class="footer" id="footer-ts">DAILY DISCOVERY DASHBOARD · UPDATED ON LOAD</div>
 </div>
@@ -2980,6 +3095,419 @@ function renderRecipe(meal) {
 
 // Load on page open
 fetchRecipe();
+
+
+// ═══════════════════════════════════════════════════
+// API NINJAS — Trivia / Facts / Riddles / Jokes / Quotes
+// ═══════════════════════════════════════════════════
+// API Ninjas: free tier = 10,000 req/month, key required
+// Get your free key at: https://api-ninjas.com
+const NINJA_API_KEY = 'YOUR_API_NINJAS_KEY'; // replace with your free key
+
+let ninjaMode = 'trivia';
+const NINJA_ENDPOINTS = {
+  trivia:  'https://api.api-ninjas.com/v1/trivia?category=',
+  facts:   'https://api.api-ninjas.com/v1/facts?limit=1',
+  riddles: 'https://api.api-ninjas.com/v1/riddles?limit=1',
+  jokes:   'https://api.api-ninjas.com/v1/jokes?limit=1',
+  quotes:  'https://api.api-ninjas.com/v1/quotes?limit=1&category=',
+};
+const NINJA_TRIVIA_CATS   = ['science','history','geography','film','music','food','sport','general_knowledge'];
+const NINJA_QUOTE_CATS    = ['inspirational','wisdom','happiness','success','attitude'];
+
+// ── Fallback datasets (used if no API key set)
+const NINJA_FALLBACK = {
+  trivia: [
+    {question:'What is the only country that borders both the Atlantic and Indian Oceans?',answer:'South Africa',category:'Geography'},
+    {question:'How many bones does an adult human body have?',answer:'206',category:'Science'},
+    {question:'What is the smallest planet in our solar system?',answer:'Mercury',category:'Science'},
+    {question:'In what year did the Berlin Wall fall?',answer:'1989',category:'History'},
+    {question:'What is the chemical symbol for gold?',answer:'Au',category:'Science'},
+    {question:'Which country invented the printing press?',answer:'Germany (Johannes Gutenberg)',category:'History'},
+    {question:'What is the largest ocean on Earth?',answer:'The Pacific Ocean',category:'Geography'},
+    {question:'How many strings does a standard guitar have?',answer:'6',category:'Music'},
+    {question:'What language has the most native speakers worldwide?',answer:'Mandarin Chinese',category:'Language'},
+    {question:'What year did the first iPhone launch?',answer:'2007',category:'Technology'},
+    {question:'How long does light take to travel from the Sun to Earth?',answer:'About 8 minutes 20 seconds',category:'Science'},
+    {question:'What is the hardest natural substance on Earth?',answer:'Diamond',category:'Science'},
+  ],
+  facts: [
+    {fact:'A group of flamingos is called a "flamboyance."'},
+    {fact:'Honey never spoils. Archaeologists have found 3,000-year-old honey in Egyptian tombs that was still edible.'},
+    {fact:'The average person walks about 100,000 miles in their lifetime — roughly four times around the Earth.'},
+    {fact:'Octopuses have three hearts, nine brains, and blue blood.'},
+    {fact:'The Eiffel Tower grows about 6 inches taller in summer due to thermal expansion.'},
+    {fact:'Bananas are berries, but strawberries are not.'},
+    {fact:'A bolt of lightning contains enough energy to toast 100,000 slices of bread.'},
+    {fact:'The human eye can distinguish approximately 10 million different colors.'},
+    {fact:'Cleopatra lived closer in time to the Moon landing than to the building of the Great Pyramid.'},
+    {fact:'There are more possible chess games than there are atoms in the observable universe.'},
+  ],
+  riddles: [
+    {riddle:'The more you take, the more you leave behind. What am I?',answer:'Footsteps'},
+    {riddle:'I speak without a mouth and hear without ears. I have no body, but I come alive with wind. What am I?',answer:'An echo'},
+    {riddle:'I have cities, but no houses live there. I have mountains, but no trees grow there. I have water, but no fish swim there. What am I?',answer:'A map'},
+    {riddle:'What has keys but no locks, space but no room, and you can enter but can\'t go in?',answer:'A keyboard'},
+    {riddle:'The person who makes it has no need for it. The person who buys it has no use for it. The person who uses it can neither see nor feel it. What is it?',answer:'A coffin'},
+    {riddle:'I can fly without wings, cry without eyes. Wherever I go, darkness follows me. What am I?',answer:'A cloud'},
+  ],
+  jokes: [
+    {setup:'Why don\'t scientists trust atoms?',punchline:'Because they make up everything.'},
+    {setup:'I told my doctor I broke my arm in two places.',punchline:'He told me to stop going to those places.'},
+    {setup:'Why did the scarecrow win an award?',punchline:'Because he was outstanding in his field.'},
+    {setup:'What do you call a factory that makes okay products?',punchline:'A satisfactory.'},
+    {setup:'Did you hear about the mathematician who\'s afraid of negative numbers?',punchline:'He\'ll stop at nothing to avoid them.'},
+    {setup:'Why don\'t eggs tell jokes?',punchline:'They\'d crack each other up.'},
+    {setup:'What do you call cheese that isn\'t yours?',punchline:'Nacho cheese.'},
+    {setup:'I\'m reading a book about anti-gravity.',punchline:'It\'s impossible to put down.'},
+  ],
+};
+
+function loadNinja(mode, btn) {
+  ninjaMode = mode;
+  document.querySelectorAll('#ninja-tabs .map-tab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const badge = document.getElementById('ninja-mode-badge');
+  if (badge) badge.textContent = mode.charAt(0).toUpperCase() + mode.slice(1);
+
+  // If no API key, use fallback
+  if (!NINJA_API_KEY || NINJA_API_KEY === 'YOUR_API_NINJAS_KEY') {
+    renderNinjaFallback(mode);
+    return;
+  }
+  fetchNinjaLive(mode);
+}
+
+async function fetchNinjaLive(mode) {
+  const el = document.getElementById('ninja-content');
+  el.innerHTML = '<div class="loading-shimmer shimmer-line" style="height:22px;width:80%;margin-bottom:10px"></div><div class="loading-shimmer shimmer-line"></div>';
+
+  let url;
+  const day = new Date().getDate();
+  if (mode === 'trivia') {
+    url = NINJA_ENDPOINTS.trivia + NINJA_TRIVIA_CATS[day % NINJA_TRIVIA_CATS.length];
+  } else if (mode === 'quotes') {
+    url = NINJA_ENDPOINTS.quotes + NINJA_QUOTE_CATS[day % NINJA_QUOTE_CATS.length];
+  } else {
+    url = NINJA_ENDPOINTS[mode];
+  }
+
+  try {
+    const data = await fetch(url, {
+      headers: { 'X-Api-Key': NINJA_API_KEY },
+      signal: AbortSignal.timeout(7000)
+    }).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); });
+
+    const item = Array.isArray(data) ? data[0] : data;
+    renderNinjaItem(mode, item);
+  } catch(e) {
+    console.warn('API Ninjas live failed:', e.message);
+    renderNinjaFallback(mode);
+  }
+}
+
+function renderNinjaFallback(mode) {
+  const items = NINJA_FALLBACK[mode] || NINJA_FALLBACK.facts;
+  const d = new Date();
+  const idx = (d.getFullYear() * 31 + d.getMonth() * 7 + d.getDate()) % items.length;
+  renderNinjaItem(mode, items[idx]);
+}
+
+function renderNinjaItem(mode, item) {
+  const el = document.getElementById('ninja-content');
+  if (!item) { el.innerHTML = '<div class="error-msg">No data returned.</div>'; return; }
+
+  if (mode === 'trivia') {
+    // Build multiple-choice options (real API returns options; fallback uses just answer)
+    const options = item.options || shuffleArray([item.answer, ...generateWrongAnswers(item.answer)]);
+    const cat     = item.category || '';
+    el.innerHTML = `
+      ${cat ? `<span class="ninja-cat-badge">${esc(cat)}</span>` : ''}
+      <div class="ninja-trivia-q" style="margin-top:8px">${esc(item.question)}</div>
+      <div class="ninja-trivia-opts" id="ninja-opts">
+        ${options.map((opt,i) => `
+          <button class="ninja-opt" onclick="checkNinjaAnswer(this,'${esc(opt.replace(/'/g,"&#39;"))}','${esc(item.answer.replace(/'/g,"&#39;"))}')">
+            ${['A','B','C','D'][i]}. ${esc(opt)}
+          </button>`).join('')}
+      </div>
+      <button class="ninja-refresh" onclick="loadNinja('trivia', document.querySelector('#ninja-tabs .map-tab.active'))">↺ New Question</button>`;
+  }
+  else if (mode === 'facts') {
+    const fact = item.fact || item.facts || '';
+    el.innerHTML = `
+      <div class="ninja-fact-big">${esc(fact)}</div>
+      <button class="ninja-refresh" onclick="loadNinja('facts', document.querySelector('#ninja-tabs .map-tab.active'))">↺ New Fact</button>`;
+  }
+  else if (mode === 'riddles') {
+    el.innerHTML = `
+      <div class="ninja-riddle-q">${esc(item.riddle)}</div>
+      <button class="ninja-riddle-reveal" id="riddle-reveal-btn" onclick="revealRiddleAnswer('${esc(item.answer.replace(/'/g,"&#39;"))}')">
+        Tap to reveal the answer ›
+      </button>
+      <div id="riddle-answer" style="display:none;background:rgba(92,184,159,.08);border:1px solid rgba(92,184,159,.2);border-radius:8px;padding:10px 14px;margin-top:8px">
+        <div style="font-family:'DM Mono',monospace;font-size:.6rem;color:var(--accent3);margin-bottom:4px;letter-spacing:1px">ANSWER</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--text)">${esc(item.answer)}</div>
+      </div>
+      <button class="ninja-refresh" style="margin-top:10px" onclick="loadNinja('riddles', document.querySelector('#ninja-tabs .map-tab.active'))">↺ New Riddle</button>`;
+  }
+  else if (mode === 'jokes') {
+    const setup     = item.setup || item.joke || item.question || '';
+    const punchline = item.punchline || item.answer || '';
+    el.innerHTML = `
+      <div class="ninja-joke-setup">${esc(setup)}</div>
+      <button class="ninja-riddle-reveal" onclick="this.style.display='none';document.getElementById('joke-punchline').style.display='block'">
+        Tap for the punchline ›
+      </button>
+      <div id="joke-punchline" style="display:none;font-family:'Cormorant Garamond',serif;font-size:1.05rem;color:var(--accent);font-style:italic;margin-top:8px;padding:10px 14px;background:rgba(201,169,110,.06);border:1px solid rgba(201,169,110,.15);border-radius:8px">${esc(punchline)}</div>
+      <button class="ninja-refresh" style="margin-top:10px" onclick="loadNinja('jokes', document.querySelector('#ninja-tabs .map-tab.active'))">↺ New Joke</button>`;
+  }
+  else if (mode === 'quotes') {
+    const quote  = item.quote  || item.content || item.quote || '';
+    const author = item.author || '';
+    const cat    = item.category || '';
+    el.innerHTML = `
+      ${cat ? `<span class="ninja-cat-badge">${esc(cat)}</span>` : ''}
+      <div class="ninja-fact-big" style="margin-top:8px;font-style:italic">"${esc(quote)}"</div>
+      ${author ? `<div class="ninja-fact-meta">— ${esc(author)}</div>` : ''}
+      <button class="ninja-refresh" style="margin-top:10px" onclick="loadNinja('quotes', document.querySelector('#ninja-tabs .map-tab.active'))">↺ New Quote</button>`;
+  }
+}
+
+function checkNinjaAnswer(btn, chosen, correct) {
+  // Disable all buttons
+  const opts = document.querySelectorAll('#ninja-opts .ninja-opt');
+  opts.forEach(b => { b.disabled = true; });
+  // Mark correct/wrong
+  opts.forEach(b => {
+    const bText = b.textContent.replace(/^[A-D]\.\s*/,'').trim();
+    if (bText === correct) b.classList.add('correct');
+    else if (b === btn)    b.classList.add('wrong');
+  });
+}
+
+function revealRiddleAnswer(answer) {
+  document.getElementById('riddle-reveal-btn').style.display = 'none';
+  document.getElementById('riddle-answer').style.display = 'block';
+}
+
+function shuffleArray(arr) {
+  const a = [...arr]; for (let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a;
+}
+
+function generateWrongAnswers(correct) {
+  // Generic plausible wrong answers for trivia fallback
+  const pools = {
+    number: ['12','42','100','1776','1969','3.14','365'],
+    default: ['It doesn\'t exist','All of the above','None of the above'],
+  };
+  const isNum = /^\d+$/.test(correct.replace(/[,\.]/g,''));
+  const pool  = isNum ? pools.number : pools.default;
+  return shuffleArray(pool.filter(x=>x!==correct)).slice(0,3);
+}
+
+// Load trivia on page open
+loadNinja('trivia', null);
+document.querySelectorAll('#ninja-tabs .map-tab')[0]?.classList.add('active');
+
+
+// ═══════════════════════════════════════════════════
+// URLSCAN.IO — URL Analysis
+// ═══════════════════════════════════════════════════
+// URLScan.io: free, no API key for public scans
+// Results are publicly visible — warn users
+const URLSCAN_API = 'https://urlscan.io/api/v1';
+
+async function runURLScan() {
+  const rawUrl = document.getElementById('urlscanInput').value.trim();
+  if (!rawUrl) return;
+  const url = rawUrl.startsWith('http') ? rawUrl : 'https://' + rawUrl;
+
+  const el = document.getElementById('urlscan-result');
+  el.innerHTML = `
+    <div style="text-align:center;padding:20px 0">
+      <div style="font-size:1.5rem;margin-bottom:10px;animation:pulse-dot 1s infinite">🔎</div>
+      <div style="font-size:.82rem;color:var(--text2);margin-bottom:6px">Submitting scan…</div>
+      <div style="font-size:.72rem;color:var(--muted)">URLScan crawls the page — takes 20–40 seconds.</div>
+    </div>`;
+
+  try {
+    // Step 1: Submit the scan (no API key needed for public scans)
+    const submitRes = await fetch(`${URLSCAN_API}/scan/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url, visibility: 'public' }),
+      signal: AbortSignal.timeout(10000)
+    });
+
+    if (!submitRes.ok) {
+      const errData = await submitRes.json().catch(() => ({}));
+      throw new Error(errData.message || `Submit failed: ${submitRes.status}`);
+    }
+
+    const submitData = await submitRes.json();
+    const scanUuid   = submitData.uuid;
+    const resultUrl  = submitData.result;
+
+    el.innerHTML = `
+      <div style="text-align:center;padding:16px 0">
+        <div style="font-size:1.2rem;margin-bottom:8px">⏳</div>
+        <div style="font-size:.82rem;color:var(--text2);margin-bottom:4px">Scan submitted — waiting for results…</div>
+        <div style="font-family:'DM Mono',monospace;font-size:.62rem;color:var(--muted)">UUID: ${esc(scanUuid)}</div>
+      </div>`;
+
+    // Step 2: Poll for results (URLScan takes ~15–30s)
+    let attempts = 0;
+    const maxAttempts = 15;
+    const pollResult = async () => {
+      attempts++;
+      if (attempts > maxAttempts) {
+        // Show link even if we timed out polling
+        el.innerHTML = `
+          <div style="font-size:.8rem;color:var(--text2);margin-bottom:12px">Scan is still processing. View results directly:</div>
+          <a href="${esc(resultUrl)}" target="_blank" rel="noopener" class="smith-link" style="display:inline-flex">View Scan Report →</a>`;
+        return;
+      }
+      try {
+        const res = await fetch(`${URLSCAN_API}/result/${scanUuid}/`, {signal: AbortSignal.timeout(8000)});
+        if (res.status === 404) {
+          // Not ready yet — try again in 3s
+          setTimeout(pollResult, 3000);
+          return;
+        }
+        if (!res.ok) throw new Error(`Result fetch: ${res.status}`);
+        const data = await res.json();
+        renderURLScanResult(data, resultUrl);
+      } catch(e) {
+        setTimeout(pollResult, 3000);
+      }
+    };
+    setTimeout(pollResult, 8000); // first check after 8s
+
+  } catch(e) {
+    // If submit failed (CORS issue), show direct link fallback
+    el.innerHTML = `
+      <div style="background:rgba(192,89,110,.08);border:1px solid rgba(192,89,110,.2);border-radius:10px;padding:14px;margin-bottom:12px">
+        <div style="font-size:.72rem;font-family:'DM Mono',monospace;color:var(--accent4);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Direct Submission Required</div>
+        <div style="font-size:.8rem;color:var(--text2);line-height:1.6">URLScan's scan submission API blocks direct browser POST requests. Submit directly on their site — results are instant and publicly shareable.</div>
+      </div>
+      <a href="https://urlscan.io/?q=${encodeURIComponent(url)}" target="_blank" rel="noopener"
+         style="display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;text-decoration:none;margin-bottom:10px"
+         onmouseover="this.style.borderColor='var(--accent4)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div>
+          <div style="font-size:.82rem;color:var(--text);font-weight:500;margin-bottom:2px">Scan ${esc(url)}</div>
+          <div style="font-size:.68rem;color:var(--muted)">Opens URLScan.io in a new tab</div>
+        </div>
+        <span style="color:var(--accent4);font-size:1.1rem">→</span>
+      </a>
+      <div class="urlscan-submit-note">💡 To enable inline scanning: add <code style="font-family:DM Mono,monospace;font-size:.75em;background:var(--surface2);padding:1px 5px;border-radius:3px">https://urlscan.io</code> to your Cloudflare Worker's ALLOWED_FEEDS list. The Worker will POST server-side and return raw JSON.</div>`;
+  }
+}
+
+function renderURLScanResult(data, resultUrl) {
+  const verdict   = data.verdicts?.overall;
+  const score     = verdict?.score ?? 0;
+  const malicious = verdict?.malicious ?? false;
+  const tags      = verdict?.tags    ?? [];
+  const cats      = verdict?.categories ?? [];
+  const page      = data.page  || {};
+  const stats     = data.stats || {};
+  const lists     = data.lists || {};
+
+  const scoreColor = malicious ? 'var(--accent4)' : score > 30 ? 'var(--accent)' : 'var(--accent3)';
+  const verdictLabel = malicious ? '⚠ Malicious' : score > 50 ? '⚠ Suspicious' : score > 0 ? 'Potentially Risky' : '✓ Clean';
+  const screenshot   = data.task?.screenshotURL || `https://urlscan.io/screenshots/${data.task?.uuid}.png`;
+
+  const allTags = [...tags, ...cats].slice(0,8);
+  const tagsHtml = allTags.map(t =>
+    `<span class="urlscan-tag ${malicious?'':'safe'}">${esc(t)}</span>`
+  ).join('');
+
+  document.getElementById('urlscan-result').innerHTML = `
+    ${screenshot ? `<img class="urlscan-screenshot" src="${esc(screenshot)}" alt="Screenshot" loading="lazy" onerror="this.style.display='none'">` : ''}
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px">
+      <div>
+        <div class="urlscan-score" style="color:${scoreColor}">${score}</div>
+        <div class="urlscan-verdict" style="color:${scoreColor}">${verdictLabel}</div>
+        <div style="font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted)">${esc(page.domain||page.url||'')}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:.68rem;color:var(--muted);margin-bottom:4px">${page.country||''}</div>
+        <div style="font-size:.68rem;color:var(--muted)">${page.server||''}</div>
+      </div>
+    </div>
+    ${allTags.length ? `<div class="urlscan-tags">${tagsHtml}</div>` : ''}
+    <div class="urlscan-detail-grid">
+      ${stats.requests  != null ? `<div class="weather-detail"><div class="wd-label">Requests</div><div class="wd-val">${stats.requests}</div></div>` : ''}
+      ${stats.consoleMsgs != null ? `<div class="weather-detail"><div class="wd-label">Console Msgs</div><div class="wd-val">${stats.consoleMsgs}</div></div>` : ''}
+      ${lists.ips?.length ? `<div class="weather-detail"><div class="wd-label">IPs Contacted</div><div class="wd-val">${lists.ips.length}</div></div>` : ''}
+      ${lists.urls?.length ? `<div class="weather-detail"><div class="wd-label">URLs Loaded</div><div class="wd-val">${lists.urls.length}</div></div>` : ''}
+    </div>
+    <a href="${esc(resultUrl)}" target="_blank" rel="noopener" class="smith-link">Full report on URLScan.io →</a>
+    <div class="urlscan-submit-note">Scans are public and visible to all URLScan.io users.</div>`;
+}
+
+
+// ═══════════════════════════════════════════════════
+// ZOO ANIMAL OF THE DAY
+// ═══════════════════════════════════════════════════
+async function fetchZooAnimal(forceNew = false) {
+  const ck = `zoo_${year}_${month}_${day}`;
+  if (!forceNew) {
+    const cached = S(ck);
+    if (cached) { try { renderZooAnimal(JSON.parse(cached)); return; } catch(e) {} }
+  }
+
+  try {
+    const data = await fetch('https://zoo-animal-api.herokuapp.com/animals/rand', {
+      signal: AbortSignal.timeout(8000)
+    }).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); });
+
+    const animal = Array.isArray(data) ? data[0] : data;
+    if (!animal) throw new Error('no animal');
+    SS(ck, JSON.stringify(animal));
+    renderZooAnimal(animal);
+  } catch(e) {
+    // Rich curated fallback
+    const fallback = [
+      {name:'Siberian Tiger',latin_name:'Panthera tigris altaica',animal_type:'Mammal',active_time:'Nocturnal',length_min:'5.5',length_max:'10.5',weight_min:'220',weight_max:'660',lifespan:'20',diet:'Carnivore',geo_range:'Russian Far East',image_link:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Tigerwater_edit2.jpg/1200px-Tigerwater_edit2.jpg'},
+      {name:'Blue Morpho Butterfly',latin_name:'Morpho peleides',animal_type:'Insect',active_time:'Diurnal',length_min:'0.25',length_max:'0.35',weight_min:'0.001',weight_max:'0.002',lifespan:'0.25',diet:'Herbivore',geo_range:'Central & South America',image_link:'https://upload.wikimedia.org/wikipedia/commons/a/a5/Blue_morpho_butterfly.jpg'},
+      {name:'Leafy Sea Dragon',latin_name:'Phycodurus eques',animal_type:'Fish',active_time:'Diurnal',length_min:'0.8',length_max:'1.2',weight_min:'0.03',weight_max:'0.1',lifespan:'7',diet:'Carnivore',geo_range:'Southern Australia',image_link:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Weedy_seadragon.jpg/1200px-Weedy_seadragon.jpg'},
+      {name:'Mandrill',latin_name:'Mandrillus sphinx',animal_type:'Mammal',active_time:'Diurnal',length_min:'2.0',length_max:'2.5',weight_min:'25',weight_max:'55',lifespan:'20',diet:'Omnivore',geo_range:'Central West Africa',image_link:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Mandrill_at_SF_Zoo.jpg/800px-Mandrill_at_SF_Zoo.jpg'},
+      {name:'Mantis Shrimp',latin_name:'Odontodactylus scyllarus',animal_type:'Crustacean',active_time:'Diurnal',length_min:'0.25',length_max:'0.5',weight_min:'0.1',weight_max:'0.3',lifespan:'20',diet:'Carnivore',geo_range:'Indo-Pacific',image_link:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Odontodactylus_scyllarus1.jpg/1200px-Odontodactylus_scyllarus1.jpg'},
+      {name:'Snow Leopard',latin_name:'Panthera uncia',animal_type:'Mammal',active_time:'Crepuscular',length_min:'3.0',length_max:'5.0',weight_min:'60',weight_max:'120',lifespan:'16',diet:'Carnivore',geo_range:'Central & South Asia',image_link:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Snow_leopard_%28Uncia_uncia%29_in_its_natural_habitat.jpg/1200px-Snow_leopard_%28Uncia_uncia%29_in_its_natural_habitat.jpg'},
+      {name:'Dumbo Octopus',latin_name:'Grimpoteuthis',animal_type:'Cephalopod',active_time:'Nocturnal',length_min:'0.5',length_max:'1.5',weight_min:'5',weight_max:'13',lifespan:'3',diet:'Carnivore',geo_range:'Deep oceans worldwide',image_link:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/Grimpoteuthis.jpg/800px-Grimpoteuthis.jpg'},
+      {name:'Axolotl',latin_name:'Ambystoma mexicanum',animal_type:'Amphibian',active_time:'Nocturnal',length_min:'0.6',length_max:'1.0',weight_min:'0.05',weight_max:'0.3',lifespan:'15',diet:'Carnivore',geo_range:'Lake Xochimilco, Mexico',image_link:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Axolotl_ganz.jpg/1200px-Axolotl_ganz.jpg'},
+    ];
+    const idx = (year*5 + month*9 + day*7) % fallback.length;
+    renderZooAnimal(fallback[idx]);
+  }
+}
+
+function renderZooAnimal(a) {
+  const badge = document.getElementById('zoo-badge');
+  if (badge) badge.textContent = a.animal_type || '—';
+
+  const lenMin = a.length_min, lenMax = a.length_max;
+  const wMin = a.weight_min, wMax = a.weight_max;
+
+  document.getElementById('zoo-content').innerHTML = `
+    ${a.image_link
+      ? `<img class="zoo-img" src="${esc(a.image_link)}" alt="${esc(a.name)}" loading="lazy" onerror="this.style.display='none'">`
+      : ''}
+    <div class="zoo-name">${esc(a.name)}</div>
+    <div class="zoo-latin">${esc(a.latin_name || '')}</div>
+    <div class="zoo-facts">
+      ${a.diet        ? `<div class="zoo-fact"><span class="zoo-fact-label">Diet</span><span class="zoo-fact-val">${esc(a.diet)}</span></div>` : ''}
+      ${a.active_time ? `<div class="zoo-fact"><span class="zoo-fact-label">Active</span><span class="zoo-fact-val">${esc(a.active_time)}</span></div>` : ''}
+      ${(lenMin&&lenMax) ? `<div class="zoo-fact"><span class="zoo-fact-label">Length</span><span class="zoo-fact-val">${lenMin}–${lenMax} ft</span></div>` : ''}
+      ${(wMin&&wMax)     ? `<div class="zoo-fact"><span class="zoo-fact-label">Weight</span><span class="zoo-fact-val">${wMin}–${wMax} lbs</span></div>` : ''}
+      ${a.lifespan    ? `<div class="zoo-fact"><span class="zoo-fact-label">Lifespan</span><span class="zoo-fact-val">${a.lifespan} years</span></div>` : ''}
+      ${a.geo_range   ? `<div class="zoo-fact"><span class="zoo-fact-label">Range</span><span class="zoo-fact-val">${esc(a.geo_range)}</span></div>` : ''}
+    </div>
+    <button class="ninja-refresh" style="margin-top:12px" onclick="fetchZooAnimal(true)">↺ New Animal</button>`;
+}
+
+fetchZooAnimal();
 
 // ═══════════════════════════════════════════════════
 // FOOTER
