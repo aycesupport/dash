@@ -731,6 +731,50 @@
     .drag-row-wrapper { padding-left: 0 !important; }
   }
 
+
+  /* ── WORLD NEWS SCROLLABLE PANEL ── */
+  .wn-tab {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 10px 14px;
+    font-size: .68rem;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition: all .15s;
+    flex-shrink: 0;
+  }
+  .wn-tab:hover { color: var(--text2); }
+  .wn-tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  /* Custom scrollbar for news feed */
+  #ap-content::-webkit-scrollbar { width: 3px; }
+  #ap-content::-webkit-scrollbar-track { background: transparent; }
+  #ap-content::-webkit-scrollbar-thumb { background: var(--muted2); border-radius: 2px; }
+  /* News items inside scrollable panel */
+  #ap-content .news-item { padding: 11px 0; }
+  #ap-content .news-item:first-child { padding-top: 14px; }
+  #ap-content .news-item:last-child { border-bottom: none; padding-bottom: 14px; }
+  .news-source-chip {
+    font-size: .6rem;
+    font-family: 'DM Mono', monospace;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 1px 7px;
+    color: var(--muted);
+    margin-right: 5px;
+    display: inline-block;
+    vertical-align: middle;
+  }
+
 </style>
 </head>
 <body>
@@ -775,13 +819,30 @@
 <div class="grid-row col-4" data-row-id="row-news-feeds" style="margin-bottom:20px">
 
   <div class="panel">
-    <div class="panel-head"><div class="panel-icon ir">📰</div><span class="panel-title">World News</span><span class="panel-badge" id="ap-badge">—</span></div>
-    <div class="panel-body" id="ap-content">
-      <div class="loading-shimmer shimmer-line"></div>
-      <div class="loading-shimmer shimmer-line" style="width:85%"></div>
-      <div class="loading-shimmer shimmer-line" style="width:75%"></div>
-      <div class="loading-shimmer shimmer-line" style="width:90%"></div>
-      <div class="loading-shimmer shimmer-line" style="width:70%"></div>
+    <div class="panel-head">
+      <div class="panel-icon ir">📰</div>
+      <span class="panel-title">World News</span>
+      <span class="panel-badge" id="ap-badge">—</span>
+      <button onclick="refreshWorldNews()" style="background:var(--surface3);border:1px solid var(--border2);border-radius:6px;padding:2px 10px;color:var(--accent);font-size:.65rem;cursor:pointer;font-family:'Outfit',sans-serif;margin-left:4px">↺</button>
+    </div>
+    <div class="panel-body" style="padding:0;display:flex;flex-direction:column">
+      <!-- Source tabs -->
+      <div id="world-news-tabs" style="display:flex;gap:0;border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto">
+        <button class="wn-tab active" onclick="switchWorldNews('bbc',this)">BBC</button>
+        <button class="wn-tab" onclick="switchWorldNews('ap',this)">AP News</button>
+        <button class="wn-tab" onclick="switchWorldNews('guardian',this)">Guardian</button>
+        <button class="wn-tab" onclick="switchWorldNews('aljazeera',this)">Al Jazeera</button>
+        <button class="wn-tab" onclick="switchWorldNews('all',this)">All</button>
+      </div>
+      <!-- Scrollable feed -->
+      <div id="ap-content" style="overflow-y:auto;max-height:420px;padding:0 18px">
+        <div class="loading-shimmer shimmer-line" style="margin-top:14px"></div>
+        <div class="loading-shimmer shimmer-line" style="width:85%;margin-top:8px"></div>
+        <div class="loading-shimmer shimmer-line" style="width:75%;margin-top:8px"></div>
+        <div class="loading-shimmer shimmer-line" style="width:90%;margin-top:8px"></div>
+        <div class="loading-shimmer shimmer-line" style="width:70%;margin-top:8px"></div>
+        <div class="loading-shimmer shimmer-line" style="width:80%;margin-top:8px"></div>
+      </div>
     </div>
   </div>
 
@@ -989,21 +1050,8 @@
 </div>
 
 <!-- ══ ROW 11: SUBREDDIT TOP POST ══ -->
-<div class="grid-row col-3" data-row-id="row-sun-ambient-links">
-  <div class="panel">
-    <div class="panel-head"><div class="panel-icon ir">👾</div><span class="panel-title">Subreddit · Top Post</span></div>
-    <div class="panel-body">
-      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap" id="subreddit-tabs">
-        <button class="map-tab active" onclick="fetchSubreddit('todayilearned',this)">TIL</button>
-        <button class="map-tab" onclick="fetchSubreddit('space',this)">Space</button>
-        <button class="map-tab" onclick="fetchSubreddit('science',this)">Science</button>
-        <button class="map-tab" onclick="fetchSubreddit('worldnews',this)">World</button>
-        <button class="map-tab" onclick="fetchSubreddit('Futurology',this)">Future</button>
-        <button class="map-tab" onclick="fetchSubreddit('dataisbeautiful',this)">Data</button>
-      </div>
-      <div id="subreddit-content"><div class="loading-shimmer shimmer-line"></div><div class="loading-shimmer shimmer-line" style="width:80%"></div></div>
-    </div>
-  </div>
+<div class="grid-row col-2" data-row-id="row-sun-ambient-links">
+  
   <div class="panel">
     <div class="panel-head"><div class="panel-icon it">💡</div><span class="panel-title">Bored? · Random Activity</span></div>
     <div class="panel-body" id="bored-content">
@@ -1377,35 +1425,171 @@ function rssFallback(elId, name, url) {
     </div>`;
 }
 
-// ── World News — live RSS with embedded static fallback
+// ══════════════════════════════════════════════
+// WORLD NEWS — Multi-source scrollable panel
+// ══════════════════════════════════════════════
+const WORLD_NEWS_SOURCES = {
+  bbc: {
+    name:'BBC World', color:'#bb1919',
+    url:'https://feeds.bbci.co.uk/news/world/rss.xml', ck:'rss_bbc',
+  },
+  ap: {
+    name:'AP News', color:'#d00',
+    url:'https://rss.app/feeds/AP_Top_News.xml', ck:'rss_ap',
+    fallback:[
+      {t:'AP News Top Stories',u:'https://apnews.com',d:'Wire-service reporting from around the world.'},
+      {t:'AP News World',u:'https://apnews.com/world-news',d:'International coverage from AP correspondents.'},
+      {t:'AP News Politics',u:'https://apnews.com/politics',d:'Political news and analysis.'},
+      {t:'AP News Science',u:'https://apnews.com/science',d:'Science and technology coverage.'},
+    ],
+  },
+  guardian: {
+    name:'The Guardian', color:'#052962',
+    url:'https://www.theguardian.com/world/rss', ck:'rss_guardian',
+  },
+  aljazeera: {
+    name:'Al Jazeera', color:'#f68b1e',
+    url:'https://www.aljazeera.com/xml/rss/all.xml', ck:'rss_aljazeera',
+  },
+};
+
+let worldNewsActive = 'bbc';
+
 async function fetchAPNews() {
-  const ck = 'rss_bbc', cached = S(ck);
-  if (cached) { try { const {data,ts}=JSON.parse(cached); if((Date.now()-ts)/3600000<1){renderRSSFeed(data,'ap-content','BBC World','ap-badge',7);return;} } catch(e){} }
-  // Try proxies
+  fetchWorldNewsSource('bbc');
+}
+
+function refreshWorldNews() {
+  const src = worldNewsActive === 'all'
+    ? Object.values(WORLD_NEWS_SOURCES)
+    : [WORLD_NEWS_SOURCES[worldNewsActive]].filter(Boolean);
+  src.forEach(s => {
+    try { const o=JSON.parse(S(s.ck)||'{}'); o.ts=0; SS(s.ck,JSON.stringify(o)); } catch(e){}
+  });
+  worldNewsActive === 'all' ? fetchAllWorldNews() : fetchWorldNewsSource(worldNewsActive);
+}
+
+function switchWorldNews(key, btn) {
+  document.querySelectorAll('.wn-tab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  worldNewsActive = key;
+  key === 'all' ? fetchAllWorldNews() : fetchWorldNewsSource(key);
+}
+
+async function fetchWorldNewsSource(key) {
+  const src = WORLD_NEWS_SOURCES[key];
+  if (!src) return;
+  const el  = document.getElementById('ap-content');
+  const bdg = document.getElementById('ap-badge');
+  if (!el) return;
+  el.innerHTML = '<div class="loading-shimmer shimmer-line" style="margin:14px 0 8px"></div><div class="loading-shimmer shimmer-line" style="width:85%;margin-bottom:8px"></div><div class="loading-shimmer shimmer-line" style="width:70%"></div>';
+
+  const cached = S(src.ck);
+  if (cached) {
+    try {
+      const {data,ts} = JSON.parse(cached);
+      if ((Date.now()-ts)/3600000 < 1) { renderWorldNews(data, src); return; }
+    } catch(e) {}
+  }
   for (const proxy of [MY_RSS_PROXY, PROXY, PROXY2]) {
     try {
-      const res  = await fetch(proxy + encodeURIComponent('https://feeds.bbci.co.uk/news/world/rss.xml'), {signal:AbortSignal.timeout(7000)});
+      const res  = await fetch(proxy + encodeURIComponent(src.url), {signal:AbortSignal.timeout(8000)});
       if (!res.ok) continue;
       const text = await res.text();
       let xml; try { xml = JSON.parse(text).contents; } catch(e) { xml = text; }
-      if (typeof xml === 'string' && xml.length > 200 && xml.includes('<')) {
-        SS(ck, JSON.stringify({data:xml, ts:Date.now()}));
-        renderRSSFeed(xml, 'ap-content', 'BBC World', 'ap-badge', 7);
+      if (xml && xml.length > 200 && xml.includes('<')) {
+        SS(src.ck, JSON.stringify({data:xml, ts:Date.now()}));
+        renderWorldNews(xml, src);
         return;
       }
-    } catch(e) {}
+    } catch(e) { continue; }
   }
-  // Static fallback — curated world news links (no auto-refresh)
-  renderStaticFeed('ap-content', 'ap-badge', 'World News', [
-    {t:'AP News — Top Headlines',u:'https://apnews.com',d:'Wire-service reporting from around the world.'},
-    {t:'Reuters — World',u:'https://www.reuters.com/world/',d:'Breaking international news and analysis.'},
-    {t:'BBC News — World',u:'https://www.bbc.com/news/world',d:'Global coverage from the BBC.'},
-    {t:'Al Jazeera — World',u:'https://www.aljazeera.com/news/',d:'International perspectives from Al Jazeera.'},
-    {t:'The Guardian — World',u:'https://www.theguardian.com/world',d:'In-depth world reporting from The Guardian.'},
-    {t:'NPR — World',u:'https://www.npr.org/sections/world/',d:'Public radio world news and features.'},
-    {t:'France 24',u:'https://www.france24.com/en/',d:'International news 24/7 from France.'},
-  ]);
+  if (src.fallback) renderStaticFeed('ap-content','ap-badge',src.name,src.fallback);
+  else renderStaticFeed('ap-content','ap-badge',src.name,[{t:src.name+' — World',u:'https://'+src.url.split('/')[2],d:'Live coverage from '+src.name+'.'}]);
 }
+
+async function fetchAllWorldNews() {
+  const el  = document.getElementById('ap-content');
+  const bdg = document.getElementById('ap-badge');
+  if (!el) return;
+  el.innerHTML = '<div class="loading-shimmer shimmer-line" style="margin:14px 0 8px"></div><div class="loading-shimmer shimmer-line" style="width:85%;margin-bottom:8px"></div>';
+
+  const allItems = [];
+  await Promise.allSettled(Object.entries(WORLD_NEWS_SOURCES).map(async ([key,src]) => {
+    let xml;
+    const cached = S(src.ck);
+    if (cached) {
+      try { const {data,ts}=JSON.parse(cached); if((Date.now()-ts)/3600000<1){xml=data;} } catch(e){}
+    }
+    if (!xml) {
+      for (const proxy of [MY_RSS_PROXY, PROXY, PROXY2]) {
+        try {
+          const res = await fetch(proxy+encodeURIComponent(src.url),{signal:AbortSignal.timeout(8000)});
+          if (!res.ok) continue;
+          const text = await res.text();
+          let c; try { c=JSON.parse(text).contents; } catch(e){c=text;}
+          if (c && c.length>200 && c.includes('<')) { xml=c; SS(src.ck,JSON.stringify({data:xml,ts:Date.now()})); break; }
+        } catch(e){continue;}
+      }
+    }
+    if (!xml) return;
+    const parser = new DOMParser();
+    const doc    = parser.parseFromString(xml,'text/xml');
+    Array.from(doc.querySelectorAll('item,entry')).slice(0,7).forEach(item => {
+      const title = item.querySelector('title')?.textContent?.trim()||'';
+      let link    = item.querySelector('link')?.textContent?.trim()||item.querySelector('link')?.getAttribute('href')||'';
+      const pub   = item.querySelector('pubDate')?.textContent||item.querySelector('updated')?.textContent||'';
+      const desc  = item.querySelector('description')?.textContent||item.querySelector('summary')?.textContent||'';
+      const div   = document.createElement('div'); div.innerHTML=desc;
+      const clean = div.textContent.replace(/\s+/g,' ').trim().slice(0,100);
+      if (title) allItems.push({title,link:link.trim(),pub,desc:clean,source:src.name,color:src.color,ts:pub?new Date(pub).getTime():0});
+    });
+  }));
+
+  allItems.sort((a,b) => b.ts-a.ts);
+  if (bdg) bdg.textContent = allItems.length+' articles';
+  if (!allItems.length) { el.innerHTML='<div class="error-msg" style="margin:14px 0">Could not load news sources.</div>'; return; }
+
+  el.innerHTML = allItems.map(item => `
+    <div class="news-item">
+      <span class="news-source-chip" style="border-color:${item.color}33;color:${item.color}">${esc(item.source)}</span>
+      <a class="news-title" href="${esc(item.link)}" target="_blank" rel="noopener">${esc(item.title)}</a>
+      ${item.desc?`<div class="news-desc">${esc(item.desc)}${item.desc.length>=100?'...':''}</div>`:''}
+      <div class="news-meta">${item.pub?timeSince(new Date(item.pub)):''}</div>
+    </div>`).join('') +
+    `<div style="font-family:'DM Mono',monospace;font-size:.58rem;color:var(--muted2);padding:10px 0 14px;text-align:right">All sources · ${new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>`;
+}
+
+function renderWorldNews(xml, src) {
+  const el  = document.getElementById('ap-content');
+  const bdg = document.getElementById('ap-badge');
+  if (!el) return;
+  const parser = new DOMParser();
+  const doc    = parser.parseFromString(xml,'text/xml');
+  const items  = Array.from(doc.querySelectorAll('item,entry')).slice(0,15);
+  if (!items.length) {
+    if (src.fallback) renderStaticFeed('ap-content','ap-badge',src.name,src.fallback);
+    return;
+  }
+  if (bdg) bdg.textContent = new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  el.innerHTML = items.map(item => {
+    const title = item.querySelector('title')?.textContent?.trim()||'';
+    let link    = item.querySelector('link')?.textContent?.trim()||item.querySelector('link')?.getAttribute('href')||'#';
+    const pub   = item.querySelector('pubDate')?.textContent||item.querySelector('updated')?.textContent||'';
+    const desc  = item.querySelector('description')?.textContent||item.querySelector('summary')?.textContent||'';
+    const div   = document.createElement('div'); div.innerHTML=desc;
+    const clean = div.textContent.replace(/\s+/g,' ').trim().slice(0,120);
+    const ago   = pub ? timeSince(new Date(pub)) : '';
+    return `<div class="news-item">
+      <a class="news-title" href="${esc(link)}" target="_blank" rel="noopener">${esc(title)}</a>
+      ${clean?`<div class="news-desc">${esc(clean)}${clean.length>=120?'...':''}</div>`:''}
+      <div class="news-meta">${esc(src.name)}${ago?' · '+ago:''}</div>
+    </div>`;
+  }).join('') +
+  `<div style="font-family:'DM Mono',monospace;font-size:.58rem;color:var(--muted2);padding:10px 0 14px;text-align:right">Fetched ${new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>`;
+}
+
+
 
 // ── BleepingComputer
 async function fetchBleeping() {
@@ -1740,7 +1924,8 @@ const greetings = hr<5 ? ['Still burning midnight oil?','The night belongs to yo
   hr<17 ? ['Good afternoon.','The day is unfolding.','Mid-day, full attention.'] :
   hr<21 ? ['Good evening.','Wind down well.','The evening edition.'] :
            ['Good night.','The stars are out.','End of day.'];
-document.getElementById('greeting').textContent = greetings[Math.floor(Math.random()*greetings.length)];
+const _greetEl = document.getElementById('greeting');
+if (_greetEl) _greetEl.textContent = greetings[Math.floor(Math.random()*greetings.length)];
 // Quotable API — fetch a quote filtered by wisdom/philosophy/motivation/happiness tags
 // Falls back to curated list if API is unavailable
 const QUOTE_TAGS = ['wisdom','philosophy','motivational','happiness','inspirational','gratitude'];
@@ -1821,12 +2006,15 @@ function getMoonPhase(d) {
   return p[Math.floor(age/(29.53/12))] || p[0];
 }
 const moon = getMoonPhase(now);
-document.getElementById('moon-emoji').textContent = moon.emoji;
-document.getElementById('moon-label').textContent  = moon.name;
+const _moonEmoji = document.getElementById('moon-emoji');
+const _moonLabel = document.getElementById('moon-label');
+if (_moonEmoji) _moonEmoji.textContent = moon.emoji;
+if (_moonLabel) _moonLabel.textContent  = moon.name;
 const dayOfYear  = Math.floor((now - new Date(year,0,0))/86400000);
 const daysInYear = (year%4===0 && (year%100!==0||year%400===0)) ? 366 : 365;
 // Set baseline immediately
-document.getElementById('day-counter').textContent = `Day ${dayOfYear} of ${daysInYear}`;
+const _dayEl = document.getElementById('day-counter');
+if (_dayEl) _dayEl.textContent = `Day ${dayOfYear} of ${daysInYear}`;
 // Then fetch a Numbers API fact about this day number
 fetchNumberFact(dayOfYear);
 
@@ -2218,92 +2406,8 @@ fetchNewspaper();
 
 // ═══════════════════════════════════════════════════
 // SUBREDDIT TOP POST
-// ═══════════════════════════════════════════════════
-async function fetchSubreddit(sub, btn) {
-  if (btn) { document.querySelectorAll('#subreddit-tabs .map-tab').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); }
-  document.getElementById('subreddit-content').innerHTML = '<div class="loading-shimmer shimmer-line"></div><div class="loading-shimmer shimmer-line" style="width:80%"></div>';
-  const ck = `reddit_${sub}_${year}_${month}_${day}`, cached = S(ck);
-  if (cached) { renderSubreddit(JSON.parse(cached)); return; }
-  try {
-    let d = null;
 
-    // Reddit endpoints to try in order
-    const endpoints = [
-      `https://www.reddit.com/r/${sub}/top.json?limit=3&t=day&raw_json=1`,
-      `https://old.reddit.com/r/${sub}/top.json?limit=3&t=day&raw_json=1`,
-      `https://api.reddit.com/r/${sub}/top?limit=3&t=day`,
-    ];
 
-    // Proxies to try for each endpoint
-    const proxies = [
-      { url: MY_RSS_PROXY, wrap: false },  // CF Worker — raw JSON (best — server-side)
-      { url: PROXY,        wrap: true  },  // allorigins
-      { url: PROXY2,       wrap: false },  // corsproxy
-    ];
-
-    outer:
-    for (const endpoint of endpoints) {
-      // 1. Try direct browser fetch first
-      try {
-        const r = await fetch(endpoint, {
-          headers:{
-            'Accept': 'application/json',
-            'User-Agent': 'Mozilla/5.0 (compatible; DashboardBot/1.0)',
-          },
-          signal: AbortSignal.timeout(5000),
-          mode: 'cors',
-          credentials: 'omit',
-        });
-        if (r.ok) { d = await r.json(); if (d?.data?.children?.length) break outer; }
-      } catch(e) {}
-
-      // 2. Try each proxy
-      for (const proxy of proxies) {
-        try {
-          const r    = await fetch(proxy.url + encodeURIComponent(endpoint), {signal:AbortSignal.timeout(8000)});
-          if (!r.ok) continue;
-          const text = await r.text();
-          let parsed;
-          if (proxy.wrap) {
-            try { parsed = JSON.parse(JSON.parse(text).contents); } catch(e) { continue; }
-          } else {
-            try { parsed = JSON.parse(text); } catch(e) { continue; }
-          }
-          if (parsed?.data?.children?.length) { d = parsed; break outer; }
-        } catch(e) { continue; }
-      }
-    }
-
-    if (!d?.data?.children?.length) throw new Error('no data from any source');
-    const post = d.data.children[0].data;
-    const obj  = {
-      title:    post.title,
-      url:      post.url,
-      permalink:`https://reddit.com${post.permalink}`,
-      score:    post.score,
-      comments: post.num_comments,
-      selftext: post.selftext || '',
-      preview:  post.preview?.images?.[0]?.source?.url?.replace(/&amp;/g,'&') || null,
-      author:   post.author,
-      flair:    post.link_flair_text || ''
-    };
-    SS(ck, JSON.stringify(obj));
-    renderSubreddit(obj);
-  } catch(e) {
-    document.getElementById('subreddit-content').innerHTML = `<div class="error-msg">Could not load r/${esc(sub)}. <a href="https://reddit.com/r/${esc(sub)}" target="_blank" rel="noopener" style="color:var(--accent)">Visit →</a></div>`;
-  }
-}
-function renderSubreddit(post) {
-  const img     = post.preview ? `<img style="width:100%;max-height:160px;object-fit:cover;border-radius:8px;margin-bottom:10px;border:1px solid var(--border)" src="${esc(post.preview)}" loading="lazy" onerror="this.style.display='none'" alt="">` : '';
-  const excerpt = post.selftext ? post.selftext.slice(0,220) : '';
-  document.getElementById('subreddit-content').innerHTML = `
-    ${img}
-    <a style="font-family:'Cormorant Garamond',serif;font-size:.9rem;color:var(--text);line-height:1.4;text-decoration:none;display:block;margin-bottom:8px" href="${esc(post.permalink)}" target="_blank" rel="noopener">${esc(post.title)}</a>
-    <div style="font-family:'DM Mono',monospace;font-size:.63rem;color:var(--muted);margin-bottom:8px">▲ ${(post.score||0).toLocaleString()} · 💬 ${(post.comments||0).toLocaleString()} · u/${esc(post.author)}${post.flair?' · '+esc(post.flair):''}</div>
-    ${excerpt?`<div style="font-size:.78rem;color:var(--text2);line-height:1.6">${esc(excerpt)}${excerpt.length>=220?'…':''}</div>`:''}
-    ${post.url&&post.url!==post.permalink?`<a href="${esc(post.url)}" target="_blank" rel="noopener" style="font-size:.7rem;color:var(--accent2);text-decoration:none;display:inline-block;margin-top:8px">Source →</a>`:''}`;
-}
-fetchSubreddit('todayilearned', null);
 
 // ═══════════════════════════════════════════════════
 // WIKIPEDIA FEATURED ARTICLE
@@ -2374,7 +2478,9 @@ function renderBored(d) {
   const tc = {education:'var(--accent2)',recreational:'var(--accent3)',social:'var(--accent)',cooking:'#e87050',relaxation:'#8090c0',recreation:'var(--accent3)',busywork:'var(--muted)'};
   const col = tc[d.type] || 'var(--muted)';
   const acc = d.accessibility != null ? Math.round((1-d.accessibility)*100) : null;
-  document.getElementById('bored-content').innerHTML = `
+  const _boredEl = document.getElementById('bored-content');
+  if (!_boredEl) return;
+  _boredEl.innerHTML = `
     <div class="bored-activity">${esc(d.activity)}</div>
     <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">
       ${d.type?`<span class="bored-chip type" style="border-color:${col};color:${col}">${esc(d.type)}</span>`:''}
@@ -2436,7 +2542,9 @@ async function fetchISS() {
         </div>`;
       }
     } catch(e2) {}
-    document.getElementById('iss-content').innerHTML = `
+    const _issEl = document.getElementById('iss-content');
+    if (!_issEl) return;
+    _issEl.innerHTML = `
       <div class="iss-coords">${Math.abs(lat)}°${latD}<br>${Math.abs(lon)}°${lonD}</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
         <div class="weather-detail"><div class="wd-label">Altitude</div><div class="wd-val">${alt} km</div></div>
@@ -2465,7 +2573,8 @@ async function fetchAQI(lat, lon, label) {
   try {
     const d    = await fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=us_aqi,pm10,pm2_5,nitrogen_dioxide,ozone`).then(r=>r.json());
     const curr = d.current, aqi = Math.round(curr.us_aqi)||0, level = getAqiLevel(aqi), pct = Math.min(100,(aqi/500)*100);
-    document.getElementById('aqi-content').innerHTML = `
+    const _aqiEl = document.getElementById('aqi-content'); if (!_aqiEl) return;
+    _aqiEl.innerHTML = `
       <div class="aqi-big" style="color:${level.color}">${aqi}</div>
       <div class="aqi-label" style="color:${level.color}">${esc(level.label)}</div>
       <div class="aqi-desc">${esc(level.desc)}</div>
@@ -2528,12 +2637,29 @@ async function fetchWeather() {
   } catch(e) { document.getElementById('weather-content').innerHTML = '<div class="error-msg">Could not load weather. Check the city name.</div>'; }
 }
 const savedCity = S('weather_city');
-if (savedCity) { document.getElementById('cityInput').value = savedCity; fetchWeather(); }
-else if (navigator.geolocation) {
-  navigator.geolocation.getCurrentPosition(p=>{
-    document.getElementById('cityInput').value = `${p.coords.latitude.toFixed(2)},${p.coords.longitude.toFixed(2)}`;
-    fetchWeather();
-  },()=>{});
+// Guard: cityInput may be null if panel not in DOM yet
+const _cityEl = document.getElementById('cityInput');
+if (_cityEl) {
+  if (savedCity) { _cityEl.value = savedCity; fetchWeather(); }
+  else if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(p=>{
+      const el = document.getElementById('cityInput');
+      if (el) { el.value = `${p.coords.latitude.toFixed(2)},${p.coords.longitude.toFixed(2)}`; fetchWeather(); }
+    },()=>{});
+  }
+} else {
+  // Defer until after drag init
+  setTimeout(() => {
+    const el = document.getElementById('cityInput');
+    if (!el) return;
+    if (savedCity) { el.value = savedCity; fetchWeather(); }
+    else if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(p=>{
+        const el2 = document.getElementById('cityInput');
+        if (el2) { el2.value = `${p.coords.latitude.toFixed(2)},${p.coords.longitude.toFixed(2)}`; fetchWeather(); }
+      },()=>{});
+    }
+  }, 300);
 }
 
 // ═══════════════════════════════════════════════════
@@ -2854,7 +2980,8 @@ function formatPrice(p, type) {
 }
 
 function renderMarkets(data) {
-  document.getElementById('market-grid').innerHTML = data.map(d => {
+  const _mktEl = document.getElementById('market-grid'); if (!_mktEl) return;
+  _mktEl.innerHTML = data.map(d => {
     const chg     = d.change24h;
     const chgStr  = chg != null ? (chg >= 0 ? '+' : '') + chg.toFixed(2) + '%' : '—';
     const cls     = chg == null ? 'flat' : chg > 0 ? 'up' : chg < 0 ? 'down' : 'flat';
@@ -2877,7 +3004,8 @@ function renderMarketsFallback() {
     {sym:'GLD',  name:'Gold ETF',      link:'https://finance.yahoo.com/quote/GLD'},
     {sym:'DXY',  name:'USD Index',     link:'https://finance.yahoo.com/quote/DX-Y.NYB'},
   ];
-  document.getElementById('market-grid').innerHTML = fallback.map(d =>
+  const _mktEl2 = document.getElementById('market-grid'); if (!_mktEl2) return;
+  _mktEl2.innerHTML = fallback.map(d =>
     `<a class="market-tile" href="${esc(d.link)}" target="_blank" rel="noopener" style="text-decoration:none;display:block">
       <div class="market-ticker">${esc(d.sym)}</div>
       <div class="market-price" style="font-size:1rem;color:var(--muted)">—</div>
@@ -3874,11 +4002,16 @@ function showSaveIndicator(msg = 'Layout saved ✓') {
   setTimeout(() => { el.style.opacity = '0'; }, 2000);
 }
 
-// Init after DOM is ready (all panels are rendered)
-// Use requestAnimationFrame to ensure DOM is fully painted first
-requestAnimationFrame(() => {
-  setTimeout(initDragLayout, 100);
-});
+// Init drag AFTER everything else has rendered
+// Use a longer delay to ensure all innerHTML assignments are done first
+function startDragWhenReady() {
+  if (document.readyState === 'complete') {
+    setTimeout(initDragLayout, 500);
+  } else {
+    window.addEventListener('load', () => setTimeout(initDragLayout, 300));
+  }
+}
+startDragWhenReady();
 
 // ═══════════════════════════════════════════════════
 // FOOTER
