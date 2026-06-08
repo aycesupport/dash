@@ -775,6 +775,145 @@
     vertical-align: middle;
   }
 
+
+  /* ── ADVICE SLIP ── */
+  .advice-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.35rem;
+    font-weight: 400;
+    color: var(--text);
+    line-height: 1.6;
+    font-style: italic;
+    margin-bottom: 14px;
+    position: relative;
+    padding-left: 16px;
+  }
+  .advice-text::before {
+    content: '"';
+    position: absolute;
+    left: 0;
+    top: -4px;
+    font-size: 2.5rem;
+    color: var(--accent);
+    opacity: 0.4;
+    font-style: normal;
+    line-height: 1;
+  }
+  .advice-id {
+    font-family: 'DM Mono', monospace;
+    font-size: .6rem;
+    color: var(--muted2);
+    letter-spacing: 1px;
+    margin-bottom: 14px;
+  }
+  .advice-refresh {
+    font-size: .68rem;
+    color: var(--accent);
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 0;
+    transition: opacity .2s;
+    display: block;
+    margin-top: 4px;
+  }
+  .advice-refresh:hover { opacity: .7; }
+  .advice-save-btn {
+    font-size: .68rem;
+    color: var(--muted);
+    cursor: pointer;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: 'Outfit', sans-serif;
+    padding: 4px 10px;
+    transition: all .15s;
+    margin-top: 10px;
+    display: inline-block;
+  }
+  .advice-save-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+  .advice-saved-list {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 120px;
+    overflow-y: auto;
+  }
+  .advice-saved-item {
+    font-size: .73rem;
+    color: var(--text2);
+    line-height: 1.4;
+    font-style: italic;
+    padding: 5px 8px;
+    background: var(--surface2);
+    border-radius: 6px;
+    border-left: 2px solid var(--accent);
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .advice-saved-item:hover { background: var(--surface3); }
+
+
+  /* ── EXPLOSM DAILY COMIC ── */
+  .comic-frame {
+    width: 100%;
+    border-radius: 10px;
+    overflow: hidden;
+    background: white;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    position: relative;
+  }
+  .comic-frame img {
+    max-width: 100%;
+    max-height: 500px;
+    display: block;
+    border-radius: 8px;
+  }
+  .comic-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    color: var(--text);
+    margin-bottom: 4px;
+    line-height: 1.3;
+  }
+  .comic-date {
+    font-family: 'DM Mono', monospace;
+    font-size: .65rem;
+    color: var(--muted);
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+  .comic-nav {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+  .comic-nav-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 14px;
+    color: var(--text2);
+    font-size: .72rem;
+    cursor: pointer;
+    font-family: 'Outfit', sans-serif;
+    transition: all .15s;
+  }
+  .comic-nav-btn:hover { border-color: var(--border2); color: var(--text); }
+  .comic-nav-btn.primary { border-color: var(--accent2); color: var(--accent2); }
+
 </style>
 </head>
 <body>
@@ -815,10 +954,10 @@
   📡 News &amp; Feeds — <span id="feeds-refresh-time">fetching…</span>
 </div>
 
-<!-- ROW: 4 news columns -->
-<div class="grid-row col-4" data-row-id="row-news-feeds" style="margin-bottom:20px">
+<!-- ROW A: World News + HN + Ars Technica -->
+<div class="grid-row col-3" data-row-id="row-news-feeds" style="margin-bottom:20px">
 
-  <div class="panel">
+<div class="panel">
     <div class="panel-head">
       <div class="panel-icon ir">📰</div>
       <span class="panel-title">World News</span>
@@ -832,6 +971,7 @@
         <button class="wn-tab" onclick="switchWorldNews('ap',this)">AP News</button>
         <button class="wn-tab" onclick="switchWorldNews('guardian',this)">Guardian</button>
         <button class="wn-tab" onclick="switchWorldNews('aljazeera',this)">Al Jazeera</button>
+        <button class="wn-tab" onclick="switchWorldNews('manson',this)" style="color:#8b5cf6">Manson</button>
         <button class="wn-tab" onclick="switchWorldNews('all',this)">All</button>
       </div>
       <!-- Scrollable feed -->
@@ -846,7 +986,7 @@
     </div>
   </div>
 
-  <div class="panel">
+<div class="panel">
     <div class="panel-head"><div class="panel-icon ir">🧡</div><span class="panel-title">Hacker News · Top</span><span class="panel-badge" id="hn-badge">—</span></div>
     <div class="panel-body" id="hn-content">
       <div class="loading-shimmer shimmer-line"></div>
@@ -856,6 +996,21 @@
       <div class="loading-shimmer shimmer-line" style="width:85%"></div>
     </div>
   </div>
+
+  <div class="panel">
+    <div class="panel-head"><div class="panel-icon ib">⚙️</div><span class="panel-title">Ars Technica</span><span class="panel-badge" id="ars-badge">—</span></div>
+    <div class="panel-body" id="ars-content">
+      <div class="loading-shimmer shimmer-line"></div>
+      <div class="loading-shimmer shimmer-line" style="width:85%"></div>
+      <div class="loading-shimmer shimmer-line" style="width:75%"></div>
+      <div class="loading-shimmer shimmer-line" style="width:90%"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ROW B: BleepingComputer + SecurityWeek + Dark Reading -->
+<div class="grid-row col-3" data-row-id="row-news-security" style="margin-bottom:20px">
 
   <div class="panel">
     <div class="panel-head"><div class="panel-icon ir">💻</div><span class="panel-title">BleepingComputer</span><span class="panel-badge" id="bleeping-badge">—</span></div>
@@ -869,6 +1024,16 @@
   </div>
 
   <div class="panel">
+    <div class="panel-head"><div class="panel-icon ir">🛡️</div><span class="panel-title">SecurityWeek</span><span class="panel-badge" id="secweek-badge">—</span></div>
+    <div class="panel-body" id="secweek-content">
+      <div class="loading-shimmer shimmer-line"></div>
+      <div class="loading-shimmer shimmer-line" style="width:80%"></div>
+      <div class="loading-shimmer shimmer-line" style="width:75%"></div>
+      <div class="loading-shimmer shimmer-line" style="width:90%"></div>
+    </div>
+  </div>
+
+  <div class="panel">
     <div class="panel-head"><div class="panel-icon ir">🔐</div><span class="panel-title">Dark Reading</span><span class="panel-badge" id="darkreading-badge">—</span></div>
     <div class="panel-body" id="darkreading-content">
       <div class="loading-shimmer shimmer-line"></div>
@@ -878,6 +1043,8 @@
       <div class="loading-shimmer shimmer-line" style="width:75%"></div>
     </div>
   </div>
+
+</div>
 
 </div>
 
@@ -1050,7 +1217,7 @@
 </div>
 
 <!-- ══ ROW 11: SUBREDDIT TOP POST ══ -->
-<div class="grid-row col-2" data-row-id="row-sun-ambient-links">
+<div class="grid-row col-3" data-row-id="row-sun-ambient-links">
   
   <div class="panel">
     <div class="panel-head"><div class="panel-icon it">💡</div><span class="panel-title">Bored? · Random Activity</span></div>
@@ -1059,6 +1226,18 @@
       <div class="loading-shimmer shimmer-line" style="width:40%"></div>
     </div>
   </div>
+  <!-- Advice Slip -->
+  <div class="panel">
+    <div class="panel-head">
+      <div class="panel-icon ig">🎯</div>
+      <span class="panel-title">Advice · Daily Thought</span>
+    </div>
+    <div class="panel-body" id="advice-content">
+      <div class="loading-shimmer shimmer-line" style="height:24px;width:85%;margin-bottom:10px"></div>
+      <div class="loading-shimmer shimmer-line" style="width:70%"></div>
+    </div>
+  </div>
+
   <div class="panel">
     <div class="panel-head"><div class="panel-icon ig">🌐</div><span class="panel-title">Library of Congress · On This Day Photo</span><span class="panel-badge" id="loc-badge">—</span></div>
     <div class="panel-body" id="loc-content">
@@ -1317,6 +1496,26 @@
 
 
 </div><!-- /drag-canvas -->
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SECTION 10 — DAILY COMIC                          -->
+<!-- ══════════════════════════════════════════════════ -->
+<div class="grid-row" data-row-id="row-daily-comic" style="margin-bottom:28px">
+  <div class="panel">
+    <div class="panel-head">
+      <div class="panel-icon ip">😂</div>
+      <span class="panel-title">Explosm · Cyanide &amp; Happiness · Daily Comic</span>
+      <span class="panel-badge" id="comic-badge">Today</span>
+      <button onclick="fetchExplosm(true)" style="background:var(--surface3);border:1px solid var(--border2);border-radius:6px;padding:2px 10px;color:var(--accent);font-size:.65rem;cursor:pointer;font-family:'Outfit',sans-serif;margin-left:6px">↺ Random</button>
+    </div>
+    <div class="panel-body" id="comic-content">
+      <div class="loading-shimmer shimmer-block" style="height:250px;margin-bottom:12px"></div>
+      <div class="loading-shimmer shimmer-line" style="width:50%"></div>
+    </div>
+  </div>
+</div>
+<!-- ══ END SECTION 10 ══ -->
+
 <div class="footer" id="footer-ts">DAILY DISCOVERY DASHBOARD · UPDATED ON LOAD</div>
 </div>
 
@@ -1335,7 +1534,9 @@ const month = now.getMonth()+1, day = now.getDate(), year = now.getFullYear();
 const MY_RSS_PROXY = 'https://rss-proxy.help-d81.workers.dev/?url=';
 const PROXY  = 'https://api.allorigins.win/get?url=';   // fallback 1
 const PROXY2 = 'https://corsproxy.io/?';                // fallback 2
-// ⚠ CF Worker allowlist also needs: numbersapi.com, quotable.io (for Numbers + Quote APIs)
+// ⚠ CF Worker allowlist also needs:
+// numbersapi.com, quotable.io, feeds.arstechnica.com,
+// www.securityweek.com, markmanson.net, explosm-1311.appspot.com
 
 function timeSince(date) {
   const s = Math.floor((new Date()-date)/1000);
@@ -1451,6 +1652,17 @@ const WORLD_NEWS_SOURCES = {
     name:'Al Jazeera', color:'#f68b1e',
     url:'https://www.aljazeera.com/xml/rss/all.xml', ck:'rss_aljazeera',
   },
+  manson: {
+    name:'Mark Manson', color:'#8b5cf6',
+    url:'https://markmanson.net/feed', ck:'rss_manson',
+    fallback:[
+      {t:'The Subtle Art of Not Giving a F*ck',u:'https://markmanson.net/books/subtle-art',d:'A counterintuitive approach to living a good life.'},
+      {t:'7 Strange Questions That Help You Find Your Life Purpose',u:'https://markmanson.net/life-purpose',d:'Questions worth sitting with.'},
+      {t:'The Failure Paradox',u:'https://markmanson.net/the-failure-paradox',d:'Why failure is the only path to success.'},
+      {t:'The Most Important Question of Your Life',u:'https://markmanson.net/question',d:'What pain do you want in your life?'},
+      {t:'How to Stop Being Lazy',u:'https://markmanson.net/how-to-stop-being-lazy',d:'Motivation is a myth — here is what actually works.'},
+    ],
+  },
 };
 
 let worldNewsActive = 'bbc';
@@ -1526,7 +1738,7 @@ async function fetchAllWorldNews() {
         try {
           const res = await fetch(proxy+encodeURIComponent(src.url),{signal:AbortSignal.timeout(8000)});
           if (!res.ok) continue;
-          const text = await res.text();
+          const text = await r.text();
           let c; try { c=JSON.parse(text).contents; } catch(e){c=text;}
           if (c && c.length>200 && c.includes('<')) { xml=c; SS(src.ck,JSON.stringify({data:xml,ts:Date.now()})); break; }
         } catch(e){continue;}
@@ -3819,6 +4031,8 @@ const ROW_LABELS = {
   'row-markets':             'Markets',
   'row-shodan-hibp-wolfram': 'Shodan · HIBP · Wolfram',
   'row-recipe':              'Daily Recipe',
+  'row-news-security':       'BleepingComputer · SecurityWeek · Dark Reading',
+  'row-daily-comic':         'Daily Comic',
   'row-api-zoo-urlscan':     'API Ninjas · URLScan · Zoo',
 };
 
@@ -4012,6 +4226,317 @@ function startDragWhenReady() {
   }
 }
 startDragWhenReady();
+
+
+// ═══════════════════════════════════════════════════
+// ADVICE SLIP — api.adviceslip.com (free, no key, CORS yes)
+// ═══════════════════════════════════════════════════
+const ADVICE_SAVED_KEY = 'advice_saved';
+
+async function fetchAdvice(forceNew = false) {
+  const el = document.getElementById('advice-content');
+  if (!el) return;
+
+  // Daily cache — same advice all day unless refreshed
+  const ck = `advice_${year}_${month}_${day}`;
+  if (!forceNew) {
+    const cached = S(ck);
+    if (cached) {
+      try { renderAdvice(JSON.parse(cached)); return; } catch(e) {}
+    }
+  }
+
+  el.innerHTML = '<div class="loading-shimmer shimmer-line" style="height:24px;width:85%;margin-bottom:10px"></div><div class="loading-shimmer shimmer-line" style="width:60%"></div>';
+
+  try {
+    // api.adviceslip.com is CORS-friendly — direct browser fetch works
+    const res  = await fetch('https://api.adviceslip.com/advice', {
+      cache: 'no-cache', // prevent browser caching the same response
+      signal: AbortSignal.timeout(6000)
+    });
+    if (!res.ok) throw new Error(res.status);
+    const data = await res.json();
+    const slip = data?.slip;
+    if (!slip?.advice) throw new Error('no advice');
+
+    SS(ck, JSON.stringify(slip));
+    renderAdvice(slip);
+  } catch(e) {
+    // Fallback curated list
+    const fallback = [
+      {id:1,  advice:'Do what you can, with what you have, where you are.'},
+      {id:2,  advice:'The best time to plant a tree was 20 years ago. The second best time is now.'},
+      {id:3,  advice:'Don\'t watch the clock; do what it does — keep going.'},
+      {id:4,  advice:'It always seems impossible until it\'s done.'},
+      {id:5,  advice:'You don\'t have to be great to start, but you have to start to be great.'},
+      {id:6,  advice:'In any given moment we have two options: to step forward into growth or back into safety.'},
+      {id:7,  advice:'Comparison is the thief of joy.'},
+      {id:8,  advice:'The only way out is through.'},
+      {id:9,  advice:'You can\'t go back and change the beginning, but you can start where you are and change the ending.'},
+      {id:10, advice:'What you do today can improve all your tomorrows.'},
+      {id:11, advice:'You don\'t have to see the whole staircase, just take the first step.'},
+      {id:12, advice:'Inaction breeds doubt and fear. Action breeds confidence and courage.'},
+      {id:13, advice:'The secret of getting ahead is getting started.'},
+      {id:14, advice:'Small daily improvements over time lead to stunning results.'},
+      {id:15, advice:'Your speed doesn\'t matter. Forward is forward.'},
+      {id:16, advice:'Worrying does not take away tomorrow\'s troubles. It takes away today\'s peace.'},
+      {id:17, advice:'Do one thing every day that scares you.'},
+      {id:18, advice:'We cannot solve problems with the kind of thinking we used to create them.'},
+      {id:19, advice:'Life is 10% what happens to you and 90% how you react to it.'},
+      {id:20, advice:'The most common form of despair is not being who you are.'},
+      {id:21, advice:'Simplicity is the ultimate sophistication.'},
+      {id:22, advice:'Either write something worth reading or do something worth writing.'},
+      {id:23, advice:'An investment in knowledge pays the best interest.'},
+      {id:24, advice:'Knowing yourself is the beginning of all wisdom.'},
+      {id:25, advice:'The cave you fear to enter holds the treasure you seek.'},
+      {id:26, advice:'Speak only if it improves upon the silence.'},
+      {id:27, advice:'Do not go where the path may lead; go instead where there is no path and leave a trail.'},
+      {id:28, advice:'Not everything that is faced can be changed, but nothing can be changed until it is faced.'},
+      {id:29, advice:'Be yourself. Everyone else is already taken.'},
+      {id:30, advice:'Wherever you are is always the right place. There is never a need to fix anything, to hitch up the broken pieces. Just this. Just here.'},
+    ];
+    const slip = fallback[(year * 7 + month * 11 + day * 13) % fallback.length];
+    SS(ck, JSON.stringify(slip));
+    renderAdvice(slip);
+  }
+}
+
+function renderAdvice(slip) {
+  const el = document.getElementById('advice-content');
+  if (!el) return;
+
+  const saved     = getSavedAdvice();
+  const isSaved   = saved.some(s => s.id === slip.id);
+  const savedHtml = saved.length
+    ? `<div class="advice-saved-list">
+        ${saved.slice(-4).reverse().map(s =>
+          `<div class="advice-saved-item" title="Saved advice #${s.id}">${esc(s.advice)}</div>`
+        ).join('')}
+       </div>`
+    : '';
+
+  el.innerHTML = `
+    <div class="advice-text">${esc(slip.advice)}</div>
+    <div class="advice-id">Advice #${slip.id}</div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <button class="advice-refresh" onclick="fetchAdvice(true)">↺ New Advice</button>
+      <button class="advice-save-btn" onclick="toggleSaveAdvice(${slip.id},'${esc(slip.advice.replace(/'/g,"&#39;"))}',this)">
+        ${isSaved ? '✓ Saved' : '+ Save'}
+      </button>
+    </div>
+    ${saved.length ? `
+      <div style="font-family:'DM Mono',monospace;font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-top:14px;margin-bottom:4px">
+        Saved (${saved.length})
+      </div>
+      ${savedHtml}` : ''}
+  `;
+}
+
+function getSavedAdvice() {
+  try { return JSON.parse(S(ADVICE_SAVED_KEY) || '[]'); } catch(e) { return []; }
+}
+
+function toggleSaveAdvice(id, advice, btn) {
+  let saved = getSavedAdvice();
+  const idx = saved.findIndex(s => s.id === id);
+  if (idx >= 0) {
+    saved.splice(idx, 1);
+    if (btn) btn.textContent = '+ Save';
+  } else {
+    saved.push({ id, advice, savedAt: new Date().toISOString() });
+    if (btn) btn.textContent = '✓ Saved';
+  }
+  SS(ADVICE_SAVED_KEY, JSON.stringify(saved));
+  // Re-render to update saved list
+  const ck = `advice_${year}_${month}_${day}`;
+  const cached = S(ck);
+  if (cached) { try { renderAdvice(JSON.parse(cached)); } catch(e) {} }
+}
+
+fetchAdvice();
+
+
+// ═══════════════════════════════════════════════════
+// ARS TECHNICA RSS
+// ═══════════════════════════════════════════════════
+async function fetchArs() {
+  const ck = `rss_ars_${year}_${month}_${day}_${new Date().getHours()}`;
+  const cached = S(ck);
+  if (cached) {
+    try { const {data} = JSON.parse(cached); renderRSSFeed(data,'ars-content','Ars Technica','ars-badge',7); return; } catch(e) {}
+  }
+  // Try both Ars feeds — tech lab first, then index
+  const feeds = [
+    'https://feeds.arstechnica.com/arstechnica/technology-lab',
+    'https://feeds.arstechnica.com/arstechnica/index',
+  ];
+  for (const url of feeds) {
+    for (const proxy of [MY_RSS_PROXY, PROXY, PROXY2]) {
+      try {
+        const res  = await fetch(proxy + encodeURIComponent(url), {signal: AbortSignal.timeout(8000)});
+        if (!res.ok) continue;
+        const text = await res.text();
+        let xml; try { xml = JSON.parse(text).contents; } catch(e) { xml = text; }
+        if (xml && xml.length > 200 && xml.includes('<')) {
+          SS(ck, JSON.stringify({data: xml, ts: Date.now()}));
+          renderRSSFeed(xml, 'ars-content', 'Ars Technica', 'ars-badge', 7);
+          return;
+        }
+      } catch(e) { continue; }
+    }
+  }
+  renderStaticFeed('ars-content','ars-badge','Ars Technica',[
+    {t:'Ars Technica — Technology Lab',u:'https://arstechnica.com/tech-policy/',d:'In-depth tech coverage and analysis.'},
+    {t:'Ars Technica — Science',u:'https://arstechnica.com/science/',d:'Science news and research.'},
+    {t:'Ars Technica — Gaming',u:'https://arstechnica.com/gaming/',d:'Gaming news and reviews.'},
+    {t:'Ars Technica — Cars',u:'https://arstechnica.com/cars/',d:'Automotive technology coverage.'},
+    {t:'Ars Technica — Security',u:'https://arstechnica.com/security/',d:'Cybersecurity news and vulnerability coverage.'},
+  ]);
+}
+fetchArs();
+
+// ═══════════════════════════════════════════════════
+// SECURITY WEEK RSS
+// ═══════════════════════════════════════════════════
+async function fetchSecurityWeek() {
+  const ck = `rss_secweek_${year}_${month}_${day}_${new Date().getHours()}`;
+  const cached = S(ck);
+  if (cached) {
+    try { const {data} = JSON.parse(cached); renderRSSFeed(data,'secweek-content','SecurityWeek','secweek-badge',7); return; } catch(e) {}
+  }
+  for (const proxy of [MY_RSS_PROXY, PROXY, PROXY2]) {
+    try {
+      const res  = await fetch(proxy + encodeURIComponent('https://www.securityweek.com/feed/'), {signal: AbortSignal.timeout(8000)});
+      if (!res.ok) continue;
+      const text = await res.text();
+      let xml; try { xml = JSON.parse(text).contents; } catch(e) { xml = text; }
+      if (xml && xml.length > 200 && xml.includes('<')) {
+        SS(ck, JSON.stringify({data: xml, ts: Date.now()}));
+        renderRSSFeed(xml, 'secweek-content', 'SecurityWeek', 'secweek-badge', 7);
+        return;
+      }
+    } catch(e) { continue; }
+  }
+  renderStaticFeed('secweek-content','secweek-badge','SecurityWeek',[
+    {t:'SecurityWeek — Latest News',u:'https://www.securityweek.com/',d:'Enterprise cybersecurity news and analysis.'},
+    {t:'Vulnerability Management',u:'https://www.securityweek.com/category/vulnerabilities/',d:'Latest CVE and patch news.'},
+    {t:'Threat Intelligence',u:'https://www.securityweek.com/category/cyberwarfare/',d:'Nation-state threats and APT coverage.'},
+    {t:'Data Breaches',u:'https://www.securityweek.com/category/data-breaches/',d:'Major breach reporting and analysis.'},
+    {t:'Identity & Access',u:'https://www.securityweek.com/category/identity-access/',d:'IAM, MFA, and authentication coverage.'},
+  ]);
+}
+fetchSecurityWeek();
+
+// ═══════════════════════════════════════════════════
+// EXPLOSM / CYANIDE & HAPPINESS — Daily Comic
+// ═══════════════════════════════════════════════════
+async function fetchExplosm(random = false) {
+  const el  = document.getElementById('comic-content');
+  const bdg = document.getElementById('comic-badge');
+  if (!el) return;
+
+  const ck = `explosm_${year}_${month}_${day}`;
+  if (!random) {
+    const cached = S(ck);
+    if (cached) { try { renderComic(JSON.parse(cached)); return; } catch(e) {} }
+  }
+
+  el.innerHTML = '<div class="loading-shimmer shimmer-block" style="height:250px;margin-bottom:12px"></div><div class="loading-shimmer shimmer-line" style="width:50%"></div>';
+
+  // Explosm API: https://explosm-1311.appspot.com/
+  // Endpoints:
+  //   /random  — random comic JSON with image URL
+  //   /latest  — today's comic
+  const baseUrl  = 'https://explosm-1311.appspot.com';
+  const endpoint = random ? `${baseUrl}/random` : `${baseUrl}/latest`;
+
+  try {
+    // Try direct first (it has permissive CORS)
+    let data = null;
+    try {
+      const r = await fetch(endpoint, {signal: AbortSignal.timeout(7000)});
+      if (r.ok) { data = await r.json(); }
+    } catch(e) {}
+
+    // If direct failed, try via proxy
+    if (!data) {
+      for (const proxy of [MY_RSS_PROXY, PROXY, PROXY2]) {
+        try {
+          const r    = await fetch(proxy + encodeURIComponent(endpoint), {signal: AbortSignal.timeout(8000)});
+          if (!r.ok) continue;
+          const text = await r.text();
+          try { data = JSON.parse(text); } catch(e) {
+            try { data = JSON.parse(JSON.parse(text).contents); } catch(e2) { continue; }
+          }
+          if (data) break;
+        } catch(e) { continue; }
+      }
+    }
+
+    if (data) {
+      const comic = {
+        id:       data.id    || data.comic_id || '',
+        img:      data.img   || data.image_url || data.url || '',
+        title:    data.title || `Comic #${data.id || ''}`,
+        date:     data.date  || data.published || '',
+        link:     data.link  || `https://explosm.net/comics/${data.id || ''}`,
+      };
+      if (!random) SS(ck, JSON.stringify(comic));
+      if (bdg) bdg.textContent = random ? 'Random' : 'Today';
+      renderComic(comic);
+      return;
+    }
+  } catch(e) { console.warn('Explosm API failed:', e.message); }
+
+  // Fallback: embed direct link with iframe or image
+  el.innerHTML = `
+    <div style="text-align:center;padding:20px 0">
+      <div style="font-size:2rem;margin-bottom:12px">😂</div>
+      <div style="font-size:.82rem;color:var(--text2);margin-bottom:16px;line-height:1.6">
+        Could not load the comic directly.<br>View on Explosm.net:
+      </div>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+        <a href="https://explosm.net" target="_blank" rel="noopener"
+           style="display:inline-flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 18px;text-decoration:none;color:var(--accent2);font-size:.82rem;font-weight:500">
+          Today's Comic →
+        </a>
+        <a href="https://explosm.net/comics/random" target="_blank" rel="noopener"
+           style="display:inline-flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 18px;text-decoration:none;color:var(--muted);font-size:.82rem">
+          Random Comic →
+        </a>
+      </div>
+      <div style="margin-top:18px;font-family:'DM Mono',monospace;font-size:.6rem;color:var(--muted)">
+        💡 Add explosm-1311.appspot.com to your CF Worker allowlist for inline comics
+      </div>
+    </div>`;
+}
+
+function renderComic(comic) {
+  const el = document.getElementById('comic-content');
+  if (!el) return;
+
+  const dateStr = comic.date
+    ? new Date(comic.date).toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})
+    : '';
+
+  el.innerHTML = `
+    ${comic.img ? `
+      <div class="comic-frame" style="margin-bottom:14px">
+        <img src="${esc(comic.img)}" alt="${esc(comic.title)}" loading="lazy"
+             onerror="this.parentElement.innerHTML='<div style=\\'padding:20px;text-align:center;color:var(--muted);font-size:.8rem\\'>Image could not load.<br><a href=\\'${esc(comic.link)}\\' target=\\'_blank\\' style=\\'color:var(--accent)\\'>View on Explosm →</a></div>'"
+        >
+      </div>` : ''}
+    ${comic.title ? `<div class="comic-title">${esc(comic.title)}</div>` : ''}
+    ${dateStr ? `<div class="comic-date">${dateStr}</div>` : ''}
+    <div class="comic-nav">
+      <button class="comic-nav-btn primary" onclick="fetchExplosm(true)">↺ Random Comic</button>
+      <a href="${esc(comic.link)}" target="_blank" rel="noopener" class="comic-nav-btn">Open on Explosm.net →</a>
+      ${comic.id ? `<a href="https://explosm.net/comics/${esc(String(comic.id))}" target="_blank" rel="noopener" class="comic-nav-btn" style="color:var(--muted)">Comic #${esc(String(comic.id))}</a>` : ''}
+    </div>`;
+}
+
+// Load on startup
+fetchExplosm();
 
 // ═══════════════════════════════════════════════════
 // FOOTER
