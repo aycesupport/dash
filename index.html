@@ -4444,128 +4444,67 @@ async function fetchExplosm(random = false) {
 
   el.innerHTML = '<div class="loading-shimmer shimmer-block" style="height:250px;margin-bottom:12px"></div><div class="loading-shimmer shimmer-line" style="width:50%"></div>';
 
-  // Explosm appspot API returns HTML pages, not JSON.
-  // Strategy 1: fetch /random or /latest HTML, parse out the comic image src
-  // Strategy 2: use the Explosm RSS feed as a reliable fallback
-  // Strategy 3: scrape explosm.net directly
+  // explosm-1311.appspot.com is an RSS feed generator that embeds the comic image
+  // in the <description> of each RSS item. It returns RSS XML, not JSON.
+  // For random: we pick a random item from the feed.
+  const feedUrl = 'https://explosm-1311.appspot.com/';
 
-  const sources = [
-    // Appspot API — returns HTML with <img> tag
-    {
-      url: random
-        ? 'https://explosm-1311.appspot.com/random'
-        : 'https://explosm-1311.appspot.com/latest',
-      type: 'html-scrape'
-    },
-    // Explosm RSS feed — reliable, returns image enclosures
-    {
-      url: 'https://explosm.net/feed',
-      type: 'rss'
-    },
-    // Explosm.net main page scrape
-    {
-      url: 'https://explosm.net',
-      type: 'html-scrape'
-    },
-  ];
+  for (const proxy of [MY_RSS_PROXY, PROXY, PROXY2]) {
+    try {
+      const res = await fetch(proxy + encodeURIComponent(feedUrl), {signal: AbortSignal.timeout(10000)});
+      if (!res.ok) continue;
 
-  for (const source of sources) {
-    for (const proxy of [MY_RSS_PROXY, PROXY, PROXY2]) {
-      try {
-        const res  = await fetch(proxy + encodeURIComponent(source.url), {signal: AbortSignal.timeout(10000)});
-        if (!res.ok) continue;
-        const text = await res.text();
+      const raw = await res.text();
+      // Unwrap allorigins JSON wrapper if present
+      let xml = raw;
+      try { xml = JSON.parse(raw).contents || raw; } catch(e) {}
+      if (!xml || xml.length < 200) continue;
 
-        // Unwrap proxy format
-        let html = text;
-        try { html = JSON.parse(text).contents || text; } catch(e) {}
-        if (!html || html.length < 100) continue;
+      // Parse RSS XML
+      const parser = new DOMParser();
+      const doc    = parser.parseFromString(xml, 'text/xml');
+      if (doc.querySelector('parsererror')) continue;
 
-        if (source.type === 'rss') {
-          // Parse RSS — Explosm encodes comic image in <enclosure> or <media:content> or <description>
-          const parser = new DOMParser();
-          const doc    = parser.parseFromString(html, 'text/xml');
-          const item   = doc.querySelector('item');
-          if (!item) continue;
+      const items = Array.from(doc.querySelectorAll('item'));
+      if (!items.length) continue;
 
-          const title   = item.querySelector('title')?.textContent?.trim() || 'Cyanide & Happiness';
-          const link    = item.querySelector('link')?.textContent?.trim() || 'https://explosm.net';
-          const pubDate = item.querySelector('pubDate')?.textContent || '';
-          const desc    = item.querySelector('description')?.textContent || '';
-          const enclosure = item.querySelector('enclosure');
+      // Pick random or first (latest)
+      const item = random
+        ? items[Math.floor(Math.random() * items.length)]
+        : items[0];
 
-          // Try enclosure url first, then scrape img from description
-          let imgUrl = enclosure?.getAttribute('url') || '';
-          if (!imgUrl) {
-            const imgMatch = desc.match(/src="([^"]*(?:explosm|cyanide)[^"]*\.(?:png|jpg|gif|webp))"/i)
-                          || desc.match(/src="([^"]+\.(?:png|jpg|gif|webp))"/i);
-            imgUrl = imgMatch ? imgMatch[1].replace(/&amp;/g,'&') : '';
-          }
+      const title   = item.querySelector('title')?.textContent?.trim() || 'Cyanide & Happiness';
+      const link    = item.querySelector('link')?.textContent?.trim()  || 'https://explosm.net';
+      const pubDate = item.querySelector('pubDate')?.textContent?.trim() || '';
+      const desc    = item.querySelector('description')?.textContent || '';
 
-          if (imgUrl || link) {
-            const comic = {
-              id: '',
-              img: imgUrl,
-              title,
-              date: pubDate,
-              link,
-            };
-            if (!random) SS(ck, JSON.stringify(comic));
-            if (bdg) bdg.textContent = random ? 'Random' : 'Today';
-            renderComic(comic);
-            return;
-          }
-        } else {
-          // HTML scrape — look for comic image patterns
-          // Explosm uses img tags with specific URL patterns
-          const imgPatterns = [
-            /https?:\/\/(?:files\.explosm\.net|assets\.explosm\.net|[^"']*explosm[^"']*)\/(comics\/[^"'\s]+\.(?:png|jpg|gif|webp))/i,
-            /https?:\/\/[^"']*\/(?:comics?|strip)[^"']*\.(?:png|jpg|gif|webp)/i,
-            /"(https?:\/\/[^"]+\.(?:png|jpg|gif))"[^>]*(?:class="[^"]*comic[^"]*"|id="[^"]*comic[^"]*")/i,
-            /src="(https?:\/\/[^"]+explosm[^"]+\.(?:png|jpg|gif|webp))"/i,
-            // appspot API wraps image in JSON-like structure or a redirect URL
-            /"url"\s*:\s*"(https?:\/\/[^"]+\.(?:png|jpg|gif|webp))"/i,
-            // direct img tag with comics path
-            /<img[^>]+src="(https?:\/\/[^"]+\/comics\/[^"]+\.(?:png|jpg|gif|webp))"/i,
-          ];
+      // The image is embedded in the description HTML as an <img src="...">
+      const imgMatch = desc.match(/<img[^>]+src=["']([^"']+)["']/i)
+                    || desc.match(/src=["']([^"']+\.(?:png|jpg|gif|webp))["']/i);
+      const imgUrl  = imgMatch ? imgMatch[1].replace(/&amp;/g, '&') : '';
 
-          let imgUrl = '';
-          for (const pattern of imgPatterns) {
-            const m = html.match(pattern);
-            if (m) { imgUrl = m[1] || m[0].match(/https?:\/\/[^\s"']+/)?.[0] || ''; break; }
-          }
+      const comic = { id: '', img: imgUrl, title, date: pubDate, link };
+      if (!random) SS(ck, JSON.stringify(comic));
+      if (bdg) bdg.textContent = random ? 'Random' : 'Today';
+      renderComic(comic);
+      return;
 
-          // Also try to extract title and date from HTML
-          const titleMatch = html.match(/<title>([^<]+)<\/title>/i);
-          const title = titleMatch ? titleMatch[1].replace(/[-|].*$/,'').trim() : 'Cyanide & Happiness';
-
-          if (imgUrl) {
-            const comic = { id: '', img: imgUrl, title, date: '', link: source.url === 'https://explosm.net' ? 'https://explosm.net' : source.url };
-            if (!random) SS(ck, JSON.stringify(comic));
-            if (bdg) bdg.textContent = random ? 'Random' : 'Today';
-            renderComic(comic);
-            return;
-          }
-        }
-      } catch(e) { continue; }
-    }
+    } catch(e) { continue; }
   }
 
-  // All sources failed — show clean direct links
+  // All proxies failed — show clean direct links
   el.innerHTML = `
     <div style="text-align:center;padding:24px 0">
       <div style="font-size:2.5rem;margin-bottom:12px">😂</div>
       <div style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--text);margin-bottom:8px">Cyanide &amp; Happiness</div>
-      <div style="font-size:.8rem;color:var(--text2);margin-bottom:20px;line-height:1.6">The comic couldn't be fetched inline today.<br>View directly on Explosm.net:</div>
+      <div style="font-size:.8rem;color:var(--text2);margin-bottom:20px;line-height:1.6">Comic couldn't be loaded inline today.</div>
       <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
         <a href="https://explosm.net" target="_blank" rel="noopener"
-           style="display:inline-flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 18px;text-decoration:none;color:var(--accent2);font-size:.82rem;font-weight:500;transition:border-color .2s"
-           onmouseover="this.style.borderColor='var(--accent2)'" onmouseout="this.style.borderColor='var(--border)'">
+           style="display:inline-flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 18px;text-decoration:none;color:var(--accent2);font-size:.82rem;font-weight:500">
           📅 Today's Comic
         </a>
         <a href="https://explosm.net/comics/random" target="_blank" rel="noopener"
-           style="display:inline-flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 18px;text-decoration:none;color:var(--accent);font-size:.82rem;transition:border-color .2s"
-           onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+           style="display:inline-flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 18px;text-decoration:none;color:var(--accent);font-size:.82rem">
           🎲 Random Comic
         </a>
       </div>
