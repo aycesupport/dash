@@ -946,6 +946,35 @@
 
 <div id="drag-canvas">
 
+<div class="grid-row col-3" data-row-id="row-weather-aqi-sun" style="margin-bottom:20px">
+  
+  <div class="panel">
+    <div class="panel-head">
+      <div class="panel-icon ic">🌡️</div>
+      <span class="panel-title">Local Weather</span>
+      <span class="panel-badge" id="weather-city-badge">—</span>
+    </div>
+    <div class="panel-body">
+      <div id="weather-content"><div class="loading-shimmer shimmer-block" style="height:80px"></div></div>
+      <div class="weather-city-input">
+        <input id="cityInput" class="city-input" placeholder="City or Zip..." onkeydown="if(event.key==='Enter')fetchWeather()">
+        <button class="btn-fetch" onclick="fetchWeather()">Search</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><div class="panel-icon ic">💨</div><span class="panel-title">Air Quality Index</span><span class="panel-badge" id="aqi-location-badge">—</span></div>
+    <div class="panel-body" id="aqi-content"><div class="loading-shimmer shimmer-block" style="height:80px"></div></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><div class="panel-icon ig">☀️</div><span class="panel-title">Sun · Rise &amp; Set</span><span class="panel-badge" id="sun-location-badge">—</span></div>
+    <div class="panel-body" id="sun-content"><div class="loading-shimmer shimmer-line" style="height:60px"></div></div>
+  </div>
+
+</div>
+
 
 <!-- ══════════════════════════════════════════════════ -->
 <!-- SECTION 1 — NEWS FEEDS (loaded on page open)      -->
@@ -1133,7 +1162,7 @@
 </div>
 
 <!-- ══ ROW 4: COUNTRY + ISS + AQI ══ -->
-<div class="grid-row col-3" data-row-id="row-word-color-fallacy">
+<div class="grid-row col-2" data-row-id="row-word-color-fallacy">
   <div class="panel">
     <div class="panel-head"><div class="panel-icon ib">🌍</div><span class="panel-title">Country Spotlight</span></div>
     <div class="panel-body" id="country-content"><div class="loading-shimmer shimmer-line" style="height:40px;width:40%;margin-bottom:10px"></div><div class="loading-shimmer shimmer-line" style="width:60%"></div><div class="loading-shimmer shimmer-line"></div></div>
@@ -1141,10 +1170,6 @@
   <div class="panel">
     <div class="panel-head"><div class="panel-icon it">🛸</div><span class="panel-title">ISS · Live Position</span><span class="panel-badge"><span class="iss-dot"></span>Live</span></div>
     <div class="panel-body" id="iss-content"><div class="loading-shimmer shimmer-line" style="height:28px;width:80%;margin-bottom:8px"></div><div class="loading-shimmer shimmer-line" style="width:50%"></div></div>
-  </div>
-  <div class="panel">
-    <div class="panel-head"><div class="panel-icon ic">💨</div><span class="panel-title">Air Quality Index</span><span class="panel-badge" id="aqi-location-badge">—</span></div>
-    <div class="panel-body" id="aqi-content"><div class="loading-shimmer shimmer-block" style="height:80px"></div></div>
   </div>
 </div>
 
@@ -1182,11 +1207,7 @@
 </div>
 
 <!-- ══ ROW 8: SUNRISE + AMBIENT + QUICK LINKS ══ -->
-<div class="grid-row col-3" data-row-id="row-windy-marine">
-  <div class="panel">
-    <div class="panel-head"><div class="panel-icon ig">☀️</div><span class="panel-title">Sun · Rise &amp; Set</span><span class="panel-badge" id="sun-location-badge">—</span></div>
-    <div class="panel-body" id="sun-content"><div class="loading-shimmer shimmer-line" style="height:60px"></div></div>
-  </div>
+<div class="grid-row col-2" data-row-id="row-windy-marine">
   <div class="panel">
     <div class="panel-head"><div class="panel-icon ip">🎧</div><span class="panel-title">Ambient Sounds</span></div>
     <div class="panel-body">
@@ -4019,6 +4040,7 @@ fetchZooAnimal();
 // ═══════════════════════════════════════════════════
 const DRAG_STORAGE_KEY = 'dash_row_order';
 const ROW_LABELS = {
+  'row-weather-aqi-sun':       'Weather · AQI · Sun',
   'row-news-feeds':          'News Feeds',
   'row-atlas-github':        'Atlas + GitHub',
   'row-apod-history':        'APOD + History',
