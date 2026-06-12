@@ -142,6 +142,39 @@
   .iss-dot { display:inline-block; width:7px; height:7px; background:var(--accent3); border-radius:50%; margin-right:6px; animation:pulse-dot 1.5s infinite; }
   @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
   .iss-coords { font-family:'DM Mono',monospace; font-size:1.6rem; color:var(--accent3); line-height:1.4; margin-bottom:10px; }
+
+  /* TASKS */
+  .task-form { display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
+  .task-input { flex:1; min-width:160px; background:var(--surface2); border:1px solid var(--border2); border-radius:8px; padding:9px 12px; color:var(--text); font-family:'Outfit',sans-serif; font-size:0.82rem; }
+  .task-input:focus { outline:none; border-color:var(--accent2); }
+  .task-select { background:var(--surface2); border:1px solid var(--border2); border-radius:8px; padding:9px 10px; color:var(--text); font-family:'Outfit',sans-serif; font-size:0.82rem; }
+  .task-add-btn { background:var(--accent2); color:#0c0c10; border:none; border-radius:8px; padding:9px 16px; font-size:0.78rem; font-weight:600; letter-spacing:0.5px; cursor:pointer; transition:opacity 0.2s; }
+  .task-add-btn:hover { opacity:0.85; }
+  .task-category { margin-bottom:18px; }
+  .task-category:last-child { margin-bottom:0; }
+  .task-category-title { font-family:'Cormorant Garamond',serif; font-size:1.15rem; font-weight:400; color:var(--accent2); margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid var(--border); }
+  .task-row { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:10px 12px; margin-bottom:8px; }
+  .task-row:last-child { margin-bottom:0; }
+  .task-left { display:flex; align-items:flex-start; gap:10px; min-width:0; flex:1; }
+  .task-checkbox { width:16px; height:16px; margin-top:2px; accent-color:var(--accent2); cursor:pointer; flex-shrink:0; }
+  .task-text { font-size:0.82rem; color:var(--text2); line-height:1.6; white-space:pre-line; }
+  .task-text.done { text-decoration:line-through; color:var(--muted); }
+  .task-actions { display:flex; gap:6px; flex-shrink:0; }
+  .task-btn { font-size:0.65rem; letter-spacing:1px; text-transform:uppercase; padding:5px 10px; border-radius:6px; cursor:pointer; font-family:'Outfit',sans-serif; font-weight:500; transition:all 0.2s; background:none; }
+  .task-btn-edit { border:1px solid var(--accent2); color:var(--accent2); }
+  .task-btn-edit:hover { background:var(--accent2); color:#0c0c10; }
+  .task-btn-del { border:1px solid var(--accent4); color:var(--accent4); }
+  .task-btn-del:hover { background:var(--accent4); color:#0c0c10; }
+  .task-btn-save { border:1px solid var(--accent3); color:var(--accent3); }
+  .task-btn-save:hover { background:var(--accent3); color:#0c0c10; }
+  .task-btn-cancel { border:1px solid var(--border2); color:var(--muted); }
+  .task-btn-cancel:hover { background:var(--border2); color:var(--text); }
+  .task-edit-wrap { margin-top:8px; display:flex; flex-direction:column; gap:6px; flex:1; }
+  .task-edit-textarea { width:100%; background:var(--surface3); border:1px solid var(--border2); border-radius:6px; padding:8px 10px; color:var(--text); font-family:'Outfit',sans-serif; font-size:0.8rem; white-space:pre-line; resize:vertical; }
+  .task-edit-textarea:focus { outline:none; border-color:var(--accent2); }
+  .task-status { font-family:'DM Mono',monospace; font-size:0.62rem; color:var(--muted); letter-spacing:0.5px; margin-bottom:10px; }
+  .task-status.err { color:var(--accent4); }
+  .task-empty { font-size:0.8rem; color:var(--muted); text-align:center; padding:20px 0; }
   .iss-sub { font-size:0.7rem; color:var(--muted); margin-bottom:16px; font-family:'DM Mono',monospace; letter-spacing:0.5px; }
   .iss-astronaut-label { font-size:0.65rem; text-transform:uppercase; letter-spacing:2px; color:var(--muted); margin-bottom:8px; }
   .astronaut-list { display:flex; flex-wrap:wrap; gap:5px; }
@@ -973,6 +1006,32 @@
     <div class="panel-body" id="sun-content"><div class="loading-shimmer shimmer-line" style="height:60px"></div></div>
   </div>
 
+</div>
+
+<div class="grid-row" data-row-id="row-tasks" style="margin-bottom:20px">
+  <div class="panel">
+    <div class="panel-head">
+      <div class="panel-icon ip">✅</div>
+      <span class="panel-title">Task Companion</span>
+      <span class="panel-badge" id="tasks-badge">—</span>
+    </div>
+    <div class="panel-body">
+      <div class="task-status" id="tasks-status">Connecting…</div>
+      <form class="task-form" id="taskForm">
+        <input class="task-input" id="taskText" type="text" placeholder="New task..." required>
+        <select class="task-select" id="taskCategory">
+          <option value="Today">Today</option>
+          <option value="Tomorrow">Tomorrow</option>
+          <option value="Costco">Costco</option>
+          <option value="Grocery store">Grocery store</option>
+          <option value="Work">Work</option>
+          <option value="Personal">Personal</option>
+        </select>
+        <button type="submit" class="task-add-btn">Add</button>
+      </form>
+      <div id="tasksContainer"></div>
+    </div>
+  </div>
 </div>
 
 
@@ -4566,6 +4625,255 @@ fetchExplosm();
 document.getElementById('footer-ts').textContent =
   `DAILY DISCOVERY DASHBOARD · ${now.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'}).toUpperCase()}`;
 
+</script>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- TASK COMPANION — Firebase Firestore sync             -->
+<!-- ═══════════════════════════════════════════════════ -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import {
+    getAuth, signInAnonymously, onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import {
+    getFirestore, collection, doc, setDoc, deleteDoc, updateDoc,
+    onSnapshot, query, orderBy
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  // ====== PLACEHOLDER: Replace with your Firebase config ======
+  const firebaseConfig = {
+        apiKey: "AIzaSyBlB1ghkwptODOfQhcrHAXoGOcQaP04rzI",
+        authDomain: "taskwidget-dashboard.firebaseapp.com",
+        projectId: "taskwidget-dashboard",
+        storageBucket: "taskwidget-dashboard.firebasestorage.app",
+        messagingSenderId: "544817573184",
+        appId: "1:544817573184:web:6e3fa493d300f86c2b9ea5"
+  };
+  // ==============================================================
+
+  const fbApp = initializeApp(firebaseConfig);
+  const auth = getAuth(fbApp);
+  const db = getFirestore(fbApp);
+
+  const statusEl = document.getElementById('tasks-status');
+  const badgeEl = document.getElementById('tasks-badge');
+  const tasksContainer = document.getElementById('tasksContainer');
+  const taskForm = document.getElementById('taskForm');
+  const taskText = document.getElementById('taskText');
+  const taskCategory = document.getElementById('taskCategory');
+
+  const CATEGORY_ORDER = ["Today", "Tomorrow", "Costco", "Grocery store", "Work", "Personal"];
+
+  function setStatus(msg, isErr) {
+    statusEl.textContent = msg;
+    statusEl.classList.toggle('err', !!isErr);
+  }
+
+  // --- Auth ---
+  signInAnonymously(auth).catch((err) => {
+    setStatus("Auth error: " + err.message, true);
+    badgeEl.textContent = "offline";
+  });
+
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      setStatus("Connected · live sync active");
+      badgeEl.textContent = "live";
+      listenToTasks();
+    } else {
+      setStatus("Not signed in.", true);
+      badgeEl.textContent = "offline";
+    }
+  });
+
+  // --- Real-time listener ---
+  function listenToTasks() {
+    const tasksRef = collection(db, "tasks");
+    const q = query(tasksRef, orderBy("timestamp", "desc"));
+
+    onSnapshot(q, (snapshot) => {
+      const tasks = [];
+      snapshot.forEach((docSnap) => {
+        tasks.push({ docId: docSnap.id, ...docSnap.data() });
+      });
+      badgeEl.textContent = tasks.length + " items";
+      renderTasks(tasks);
+    }, (error) => {
+      setStatus("Sync error: " + error.message, true);
+      badgeEl.textContent = "error";
+    });
+  }
+
+  // --- Render grouped tasks ---
+  function renderTasks(tasks) {
+    tasksContainer.innerHTML = "";
+
+    const grouped = {};
+    tasks.forEach((task) => {
+      const cat = task.category || "Uncategorized";
+      if (!grouped[cat]) grouped[cat] = [];
+      grouped[cat].push(task);
+    });
+
+    const allCats = Object.keys(grouped);
+    allCats.sort((a, b) => {
+      const ai = CATEGORY_ORDER.indexOf(a);
+      const bi = CATEGORY_ORDER.indexOf(b);
+      if (ai !== -1 && bi !== -1) return ai - bi;
+      if (ai !== -1) return -1;
+      if (bi !== -1) return 1;
+      return a.localeCompare(b);
+    });
+
+    if (allCats.length === 0) {
+      tasksContainer.innerHTML = `<div class="task-empty">No tasks yet. Add one above!</div>`;
+      return;
+    }
+
+    allCats.forEach((cat) => {
+      const section = document.createElement("div");
+      section.className = "task-category";
+
+      const header = document.createElement("div");
+      header.className = "task-category-title";
+      header.textContent = cat;
+      section.appendChild(header);
+
+      grouped[cat].forEach((task) => {
+        const row = document.createElement("div");
+        row.className = "task-row";
+
+        const left = document.createElement("div");
+        left.className = "task-left";
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.className = "task-checkbox";
+        checkbox.checked = !!task.completed;
+        checkbox.addEventListener("change", () => toggleCompleted(task.docId, checkbox.checked));
+
+        const label = document.createElement("span");
+        label.textContent = task.text;
+        label.className = "task-text" + (task.completed ? " done" : "");
+
+        left.appendChild(checkbox);
+        left.appendChild(label);
+
+        // Edit mode elements
+        const editWrap = document.createElement("div");
+        editWrap.className = "task-edit-wrap";
+        editWrap.style.display = "none";
+
+        const textarea = document.createElement("textarea");
+        textarea.className = "task-edit-textarea";
+        textarea.value = task.text;
+        textarea.rows = Math.max(2, (task.text.match(/\n/g) || []).length + 1);
+
+        const editBtnRow = document.createElement("div");
+        editBtnRow.className = "task-actions";
+
+        const saveBtn = document.createElement("button");
+        saveBtn.textContent = "Save";
+        saveBtn.className = "task-btn task-btn-save";
+
+        const cancelBtn = document.createElement("button");
+        cancelBtn.textContent = "Cancel";
+        cancelBtn.className = "task-btn task-btn-cancel";
+
+        editBtnRow.appendChild(saveBtn);
+        editBtnRow.appendChild(cancelBtn);
+        editWrap.appendChild(textarea);
+        editWrap.appendChild(editBtnRow);
+        left.appendChild(editWrap);
+
+        // Action buttons
+        const actions = document.createElement("div");
+        actions.className = "task-actions";
+
+        const editBtn = document.createElement("button");
+        editBtn.textContent = "Edit";
+        editBtn.className = "task-btn task-btn-edit";
+
+        const delBtn = document.createElement("button");
+        delBtn.textContent = "Delete";
+        delBtn.className = "task-btn task-btn-del";
+        delBtn.addEventListener("click", () => deleteTask(task.docId));
+
+        actions.appendChild(editBtn);
+        actions.appendChild(delBtn);
+
+        editBtn.addEventListener("click", () => {
+          label.style.display = "none";
+          editWrap.style.display = "flex";
+          textarea.focus();
+        });
+
+        cancelBtn.addEventListener("click", () => {
+          textarea.value = task.text;
+          editWrap.style.display = "none";
+          label.style.display = "";
+        });
+
+        saveBtn.addEventListener("click", () => {
+          editTaskText(task.docId, textarea.value);
+        });
+
+        row.appendChild(left);
+        row.appendChild(actions);
+        section.appendChild(row);
+      });
+
+      tasksContainer.appendChild(section);
+    });
+  }
+
+  // --- Actions ---
+  async function toggleCompleted(docId, completed) {
+    try {
+      await updateDoc(doc(db, "tasks", docId), { completed });
+    } catch (e) {
+      setStatus("Error updating task: " + e.message, true);
+    }
+  }
+
+  async function editTaskText(docId, newText) {
+    const trimmed = newText.trim();
+    if (!trimmed) return;
+    try {
+      await updateDoc(doc(db, "tasks", docId), { text: trimmed });
+    } catch (e) {
+      setStatus("Error editing task: " + e.message, true);
+    }
+  }
+
+  async function deleteTask(docId) {
+    try {
+      await deleteDoc(doc(db, "tasks", docId));
+    } catch (e) {
+      setStatus("Error deleting task: " + e.message, true);
+    }
+  }
+
+  taskForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const text = taskText.value.trim();
+    const category = taskCategory.value;
+    if (!text) return;
+
+    try {
+      const newId = crypto.randomUUID();
+      await setDoc(doc(db, "tasks", newId), {
+        id: newId,
+        text,
+        completed: false,
+        category,
+        timestamp: Date.now()
+      });
+      taskText.value = "";
+    } catch (e) {
+      setStatus("Error adding task: " + e.message, true);
+    }
+  });
 </script>
 
 </body>
