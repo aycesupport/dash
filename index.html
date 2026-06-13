@@ -94,6 +94,14 @@
   .panel-title { font-size:0.67rem; text-transform:uppercase; letter-spacing:2.5px; color:var(--muted); font-weight:600; flex:1; }
   .panel-badge { font-family:'DM Mono',monospace; font-size:0.6rem; color:var(--muted); letter-spacing:1px; background:var(--surface2); padding:2px 8px; border-radius:20px; border:1px solid var(--border); }
   .panel-body { padding:18px 20px; flex:1; }
+  .panel.collapsed .panel-body { display:none; }
+  .panel-collapse-toggle {
+    background:none; border:1px solid var(--border, #444); color:var(--muted, #999);
+    border-radius:6px; font-size:.7rem; padding:2px 8px; cursor:pointer; margin-left:auto;
+    font-family:'DM Mono',monospace;
+  }
+  .panel-collapse-toggle .chev { display:inline-block; transition:transform .2s; }
+  .panel.collapsed .panel-collapse-toggle .chev { transform:rotate(-90deg); }
 
   /* SHIMMER */
   .loading-shimmer { background:linear-gradient(90deg,var(--surface2) 0%,var(--surface3) 50%,var(--surface2) 100%); background-size:200% 100%; animation:shimmer 1.8s infinite; border-radius:6px; }
@@ -988,12 +996,13 @@
 </div>
 
 <div class="grid-row" data-row-id="row-tasks" style="margin-bottom:20px">
-  <div class="panel">
+  <div class="panel collapsed" id="taskCompanionPanel">
     <div class="panel-head">
       <div class="panel-icon ip">✅</div>
       <span class="panel-title">Task Companion</span>
       <span class="panel-badge" id="tasks-badge">—</span>
       <button class="task-trash-toggle" id="trashToggleBtn" type="button">🗑 Trash</button>
+      <button class="panel-collapse-toggle" id="taskCompanionToggle" type="button"><span class="chev">▾</span></button>
     </div>
     <div class="panel-body">
       <div class="task-status" id="tasks-status">Connecting…</div>
@@ -1039,7 +1048,7 @@
         <button class="wn-tab" onclick="switchWorldNews('ap',this)">AP News</button>
         <button class="wn-tab" onclick="switchWorldNews('guardian',this)">Guardian</button>
         <button class="wn-tab" onclick="switchWorldNews('aljazeera',this)">Al Jazeera</button>
-        <button class="wn-tab" onclick="switchWorldNews('manson',this)" style="color:#8b5cf6">Manson</button>
+        <button class="wn-tab" onclick="switchWorldNews('allsides',this)" style="color:#8b5cf6">AllSides</button>
         <button class="wn-tab" onclick="switchWorldNews('all',this)">All</button>
       </div>
       <!-- Scrollable feed -->
@@ -1658,15 +1667,11 @@ const WORLD_NEWS_SOURCES = {
     name:'Al Jazeera', color:'#f68b1e',
     url:'https://www.aljazeera.com/xml/rss/all.xml', ck:'rss_aljazeera',
   },
-  manson: {
-    name:'Mark Manson', color:'#8b5cf6',
-    url:'https://markmanson.net/feed', ck:'rss_manson',
+  allsides: {
+    name:'AllSides', color:'#8b5cf6',
+    url:'https://www.allsides.com/rss/news', ck:'rss_allsides',
     fallback:[
-      {t:'The Subtle Art of Not Giving a F*ck',u:'https://markmanson.net/books/subtle-art',d:'A counterintuitive approach to living a good life.'},
-      {t:'7 Strange Questions That Help You Find Your Life Purpose',u:'https://markmanson.net/life-purpose',d:'Questions worth sitting with.'},
-      {t:'The Failure Paradox',u:'https://markmanson.net/the-failure-paradox',d:'Why failure is the only path to success.'},
-      {t:'The Most Important Question of Your Life',u:'https://markmanson.net/question',d:'What pain do you want in your life?'},
-      {t:'How to Stop Being Lazy',u:'https://markmanson.net/how-to-stop-being-lazy',d:'Motivation is a myth — here is what actually works.'},
+      {t:'AllSides Balanced News',u:'https://www.allsides.com/unbiased-balanced-news',d:'Compare news coverage from the left, center, and right.'},
     ],
   },
 };
@@ -4740,11 +4745,20 @@ fetchExplosm();
 document.getElementById('footer-ts').textContent =
   `DAILY DISCOVERY DASHBOARD · ${now.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'}).toUpperCase()}`;
 
+(function(){
+  var panel = document.getElementById('taskCompanionPanel');
+  var btn = document.getElementById('taskCompanionToggle');
+  var KEY = 'taskCompanionCollapsed';
+  var saved = localStorage.getItem(KEY);
+  if (saved !== null) {
+    panel.classList.toggle('collapsed', saved === 'true');
+  }
+  btn.addEventListener('click', function(){
+    panel.classList.toggle('collapsed');
+    localStorage.setItem(KEY, panel.classList.contains('collapsed'));
+  });
+})();
 </script>
-
-<!-- ═══════════════════════════════════════════════════ -->
-<!-- TASK COMPANION — Firebase Firestore sync             -->
-<!-- ═══════════════════════════════════════════════════ -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import {
