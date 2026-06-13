@@ -175,6 +175,15 @@
   .task-status { font-family:'DM Mono',monospace; font-size:0.62rem; color:var(--muted); letter-spacing:0.5px; margin-bottom:10px; }
   .task-status.err { color:var(--accent4); }
   .task-empty { font-size:0.8rem; color:var(--muted); text-align:center; padding:20px 0; }
+  .task-trash-toggle { margin-left:auto; background:none; border:1px solid var(--border2); color:var(--muted); border-radius:6px; padding:4px 10px; font-size:0.65rem; letter-spacing:1px; text-transform:uppercase; cursor:pointer; font-family:'Outfit',sans-serif; transition:all 0.2s; }
+  .task-trash-toggle:hover { border-color:var(--accent2); color:var(--accent2); }
+  .task-trash-toggle.active { background:var(--accent2); border-color:var(--accent2); color:#0c0c10; }
+  .task-row.trashed { opacity:0.7; border-style:dashed; }
+  .task-btn-restore { border:1px solid var(--accent3); color:var(--accent3); }
+  .task-btn-restore:hover { background:var(--accent3); color:#0c0c10; }
+  .task-btn-purge { border:1px solid var(--accent4); color:var(--accent4); }
+  .task-btn-purge:hover { background:var(--accent4); color:#0c0c10; }
+  .task-trash-note { font-family:'DM Mono',monospace; font-size:0.62rem; color:var(--muted); letter-spacing:0.5px; margin-bottom:12px; padding:8px 10px; background:var(--surface2); border-radius:6px; border:1px solid var(--border); }
   .iss-sub { font-size:0.7rem; color:var(--muted); margin-bottom:16px; font-family:'DM Mono',monospace; letter-spacing:0.5px; }
   .iss-astronaut-label { font-size:0.65rem; text-transform:uppercase; letter-spacing:2px; color:var(--muted); margin-bottom:8px; }
   .astronaut-list { display:flex; flex-wrap:wrap; gap:5px; }
@@ -225,26 +234,6 @@
   .day-length-label { font-size:0.62rem; text-transform:uppercase; letter-spacing:1.5px; color:var(--muted); margin-bottom:3px; }
   .day-length-val { font-family:'Cormorant Garamond',serif; font-size:1.1rem; color:var(--accent); }
 
-  /* AMBIENT */
-  .ambient-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-  .ambient-btn { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:12px; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:10px; font-family:'Outfit',sans-serif; color:var(--text2); font-size:0.78rem; }
-  .ambient-btn:hover { border-color:var(--border2); }
-  .ambient-btn.playing { border-color:var(--accent3); color:var(--accent3); background:rgba(92,184,159,0.06); }
-  .ambient-icon { font-size:1.1rem; }
-  .ambient-vol { width:100%; margin-top:14px; padding-top:12px; border-top:1px solid var(--border); display:flex; align-items:center; gap:10px; font-size:0.72rem; color:var(--muted); }
-  .vol-slider { flex:1; appearance:none; height:3px; background:var(--border2); border-radius:2px; outline:none; cursor:pointer; }
-  .vol-slider::-webkit-slider-thumb { appearance:none; width:12px; height:12px; background:var(--accent); border-radius:50%; }
-
-  /* LINKS */
-  .links-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(90px,1fr)); gap:8px; }
-  .link-item { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:12px 8px; text-align:center; cursor:pointer; transition:all 0.2s; text-decoration:none; display:block; }
-  .link-item:hover { border-color:var(--border2); background:var(--surface3); transform:translateY(-1px); }
-  .link-favicon { width:24px; height:24px; margin:0 auto 6px; display:block; }
-  .link-name { font-size:0.7rem; color:var(--text2); }
-  .link-add-row { display:flex; gap:8px; margin-top:14px; padding-top:12px; border-top:1px solid var(--border); }
-  .link-input { flex:1; background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:7px 12px; color:var(--text); font-family:'Outfit',sans-serif; font-size:0.78rem; outline:none; transition:border 0.2s; min-width:0; }
-  .link-input:focus { border-color:var(--accent); }
-  .link-input::placeholder { color:var(--muted); }
 
   /* ── COLOR OF THE DAY ── */
   .color-swatch {
@@ -544,12 +533,6 @@
     /* Smithsonian */
     .smith-img { height: 160px; }
 
-    /* Quick links — smaller grid */
-    .links-grid { grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); }
-
-    /* Ambient grid */
-    .ambient-grid { grid-template-columns: 1fr 1fr; }
-
     /* Events grid */
     #local-events-content .event-grid,
     [style*="minmax(200px"] { grid-template-columns: 1fr !important; }
@@ -600,10 +583,6 @@
 
     /* Collapse news descriptions */
     .hn-meta { display: none; }
-
-    /* Links grid tighter */
-    .links-grid { grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); }
-    .link-name { font-size: .62rem; }
 
     /* Vulnerability list — more compact */
     .vuln-item { padding: 7px 0; }
@@ -1014,6 +993,7 @@
       <div class="panel-icon ip">✅</div>
       <span class="panel-title">Task Companion</span>
       <span class="panel-badge" id="tasks-badge">—</span>
+      <button class="task-trash-toggle" id="trashToggleBtn" type="button">🗑 Trash</button>
     </div>
     <div class="panel-body">
       <div class="task-status" id="tasks-status">Connecting…</div>
@@ -1042,8 +1022,8 @@
   📡 News &amp; Feeds — <span id="feeds-refresh-time">fetching…</span>
 </div>
 
-<!-- ROW A: World News + HN + Ars Technica -->
-<div class="grid-row col-3" data-row-id="row-news-feeds" style="margin-bottom:20px">
+<!-- ROW A: World News -->
+<div class="grid-row" data-row-id="row-news-feeds" style="margin-bottom:20px">
 
 <div class="panel">
     <div class="panel-head">
@@ -1074,61 +1054,37 @@
     </div>
   </div>
 
-<div class="panel">
-    <div class="panel-head"><div class="panel-icon ir">🧡</div><span class="panel-title">Hacker News · Top</span><span class="panel-badge" id="hn-badge">—</span></div>
-    <div class="panel-body" id="hn-content">
-      <div class="loading-shimmer shimmer-line"></div>
-      <div class="loading-shimmer shimmer-line" style="width:80%"></div>
-      <div class="loading-shimmer shimmer-line" style="width:90%"></div>
-      <div class="loading-shimmer shimmer-line" style="width:65%"></div>
-      <div class="loading-shimmer shimmer-line" style="width:85%"></div>
-    </div>
-  </div>
-
-  <div class="panel">
-    <div class="panel-head"><div class="panel-icon ib">⚙️</div><span class="panel-title">Ars Technica</span><span class="panel-badge" id="ars-badge">—</span></div>
-    <div class="panel-body" id="ars-content">
-      <div class="loading-shimmer shimmer-line"></div>
-      <div class="loading-shimmer shimmer-line" style="width:85%"></div>
-      <div class="loading-shimmer shimmer-line" style="width:75%"></div>
-      <div class="loading-shimmer shimmer-line" style="width:90%"></div>
-    </div>
-  </div>
-
 </div>
 
-<!-- ROW B: BleepingComputer + SecurityWeek + Dark Reading -->
-<div class="grid-row col-3" data-row-id="row-news-security" style="margin-bottom:20px">
+<!-- ROW B: Cyber & Tech News (tabbed) -->
+<div class="grid-row" data-row-id="row-cyber-news" style="margin-bottom:20px">
 
-  <div class="panel">
-    <div class="panel-head"><div class="panel-icon ir">💻</div><span class="panel-title">BleepingComputer</span><span class="panel-badge" id="bleeping-badge">—</span></div>
-    <div class="panel-body" id="bleeping-content">
-      <div class="loading-shimmer shimmer-line"></div>
-      <div class="loading-shimmer shimmer-line" style="width:75%"></div>
-      <div class="loading-shimmer shimmer-line" style="width:90%"></div>
-      <div class="loading-shimmer shimmer-line" style="width:80%"></div>
-      <div class="loading-shimmer shimmer-line" style="width:70%"></div>
+<div class="panel">
+    <div class="panel-head">
+      <div class="panel-icon ir">🔐</div>
+      <span class="panel-title">Cyber &amp; Tech News</span>
+      <span class="panel-badge" id="cyber-badge">—</span>
+      <button onclick="refreshCyberNews()" style="background:var(--surface3);border:1px solid var(--border2);border-radius:6px;padding:2px 10px;color:var(--accent);font-size:.65rem;cursor:pointer;font-family:'Outfit',sans-serif;margin-left:4px">↺</button>
     </div>
-  </div>
-
-  <div class="panel">
-    <div class="panel-head"><div class="panel-icon ir">🛡️</div><span class="panel-title">SecurityWeek</span><span class="panel-badge" id="secweek-badge">—</span></div>
-    <div class="panel-body" id="secweek-content">
-      <div class="loading-shimmer shimmer-line"></div>
-      <div class="loading-shimmer shimmer-line" style="width:80%"></div>
-      <div class="loading-shimmer shimmer-line" style="width:75%"></div>
-      <div class="loading-shimmer shimmer-line" style="width:90%"></div>
-    </div>
-  </div>
-
-  <div class="panel">
-    <div class="panel-head"><div class="panel-icon ir">🔐</div><span class="panel-title">Dark Reading</span><span class="panel-badge" id="darkreading-badge">—</span></div>
-    <div class="panel-body" id="darkreading-content">
-      <div class="loading-shimmer shimmer-line"></div>
-      <div class="loading-shimmer shimmer-line" style="width:80%"></div>
-      <div class="loading-shimmer shimmer-line" style="width:70%"></div>
-      <div class="loading-shimmer shimmer-line" style="width:85%"></div>
-      <div class="loading-shimmer shimmer-line" style="width:75%"></div>
+    <div class="panel-body" style="padding:0;display:flex;flex-direction:column">
+      <!-- Source tabs -->
+      <div id="cyber-news-tabs" style="display:flex;gap:0;border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto">
+        <button class="wn-tab active" onclick="switchCyberNews('bleeping',this)">BleepingComputer</button>
+        <button class="wn-tab" onclick="switchCyberNews('darkreading',this)">Dark Reading</button>
+        <button class="wn-tab" onclick="switchCyberNews('secweek',this)">SecurityWeek</button>
+        <button class="wn-tab" onclick="switchCyberNews('ars',this)">Ars Technica</button>
+        <button class="wn-tab" onclick="switchCyberNews('hn',this)">Hacker News</button>
+        <button class="wn-tab" onclick="switchCyberNews('all',this)">All</button>
+      </div>
+      <!-- Scrollable feed -->
+      <div id="cyber-content" style="overflow-y:auto;max-height:420px;padding:0 18px">
+        <div class="loading-shimmer shimmer-line" style="margin-top:14px"></div>
+        <div class="loading-shimmer shimmer-line" style="width:85%;margin-top:8px"></div>
+        <div class="loading-shimmer shimmer-line" style="width:75%;margin-top:8px"></div>
+        <div class="loading-shimmer shimmer-line" style="width:90%;margin-top:8px"></div>
+        <div class="loading-shimmer shimmer-line" style="width:70%;margin-top:8px"></div>
+        <div class="loading-shimmer shimmer-line" style="width:80%;margin-top:8px"></div>
+      </div>
     </div>
   </div>
 
@@ -1260,37 +1216,6 @@
       </div>
       <div class="map-embed">
         <iframe id="marine-iframe" src="https://www.marinetraffic.com/en/ais/embed/zoom:3/centery:20/centerx:-20/maptype:0/shownames:false/mmsi:0/shipid:0/fleet:/fleet_id:/vtypes:/showmenu:/remember:false" allowfullscreen></iframe>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ ROW 8: SUNRISE + AMBIENT + QUICK LINKS ══ -->
-<div class="grid-row col-2" data-row-id="row-windy-marine">
-  <div class="panel">
-    <div class="panel-head"><div class="panel-icon ip">🎧</div><span class="panel-title">Ambient Sounds</span></div>
-    <div class="panel-body">
-      <div class="ambient-grid">
-        <button class="ambient-btn" id="amb-rain" onclick="toggleAmbient('rain')"><span class="ambient-icon">🌧</span> Rain</button>
-        <button class="ambient-btn" id="amb-forest" onclick="toggleAmbient('forest')"><span class="ambient-icon">🌲</span> Forest</button>
-        <button class="ambient-btn" id="amb-waves" onclick="toggleAmbient('waves')"><span class="ambient-icon">🌊</span> Ocean</button>
-        <button class="ambient-btn" id="amb-fire" onclick="toggleAmbient('fire')"><span class="ambient-icon">🔥</span> Fireplace</button>
-      </div>
-      <div class="ambient-vol">
-        <span>🔈</span>
-        <input type="range" class="vol-slider" id="vol-slider" min="0" max="1" step="0.05" value="0.5" oninput="setVolume(this.value)">
-        <span>🔊</span>
-      </div>
-    </div>
-  </div>
-  <div class="panel">
-    <div class="panel-head"><div class="panel-icon ig">🔗</div><span class="panel-title">Quick Links</span></div>
-    <div class="panel-body">
-      <div class="links-grid" id="links-grid"></div>
-      <div class="link-add-row">
-        <input id="linkName" class="link-input" placeholder="Label" style="max-width:90px">
-        <input id="linkUrl" class="link-input" placeholder="URL" onkeydown="if(event.key==='Enter')addLink()">
-        <button class="btn-fetch" onclick="addLink()">Add</button>
       </div>
     </div>
   </div>
@@ -1883,6 +1808,256 @@ function renderWorldNews(xml, src) {
 }
 
 
+// ══════════════════════════════════════════════
+// CYBER & TECH NEWS — Multi-source tabbed panel
+// ══════════════════════════════════════════════
+const CYBER_NEWS_SOURCES = {
+  bleeping: {
+    name:'BleepingComputer', color:'#e8702a',
+    url:'https://www.bleepingcomputer.com/feed/', ck:'rss_bleeping',
+    fallback:[
+      {t:'BleepingComputer — Latest',u:'https://www.bleepingcomputer.com/',d:'Security news, tutorials and threat reports.'},
+      {t:'Ransomware News',u:'https://www.bleepingcomputer.com/tag/ransomware/',d:'Latest ransomware attacks and coverage.'},
+      {t:'Data Breaches',u:'https://www.bleepingcomputer.com/tag/data-breach/',d:'Major data breach reporting.'},
+      {t:'Malware Analysis',u:'https://www.bleepingcomputer.com/tag/malware/',d:'Malware research and teardowns.'},
+      {t:'Vulnerabilities',u:'https://www.bleepingcomputer.com/tag/vulnerability/',d:'Newly disclosed vulnerability coverage.'},
+      {t:'Windows Security',u:'https://www.bleepingcomputer.com/tag/windows/',d:'Microsoft and Windows security news.'},
+      {t:'Zero-Day Exploits',u:'https://www.bleepingcomputer.com/tag/zero-day/',d:'Active zero-day exploit reporting.'},
+    ],
+  },
+  darkreading: {
+    name:'Dark Reading', color:'#ff4d4d',
+    url:'https://www.darkreading.com/rss.xml', ck:'rss_darkreading',
+    fallback:[
+      {t:'Dark Reading — Latest',u:'https://www.darkreading.com/',d:'Enterprise security news, analysis and research.'},
+      {t:'Threat Intelligence',u:'https://www.darkreading.com/threat-intelligence',d:'Current threat landscape and actor tracking.'},
+      {t:'Cloud Security',u:'https://www.darkreading.com/cloud-security',d:'Cloud infrastructure and SaaS security coverage.'},
+      {t:'Vulnerabilities & Threats',u:'https://www.darkreading.com/vulnerabilities-threats',d:'Newly discovered vulnerabilities and active exploits.'},
+      {t:'Application Security',u:'https://www.darkreading.com/application-security',d:'Secure development and AppSec news.'},
+      {t:'Endpoint Security',u:'https://www.darkreading.com/endpoint-security',d:'EDR, detection, and endpoint protection coverage.'},
+      {t:'Identity & Access',u:'https://www.darkreading.com/identity-access-management',d:'IAM, MFA, and access control reporting.'},
+    ],
+  },
+  secweek: {
+    name:'SecurityWeek', color:'#3ba0ff',
+    url:'https://www.securityweek.com/feed/', ck:'rss_secweek',
+    fallback:[
+      {t:'SecurityWeek — Latest News',u:'https://www.securityweek.com/',d:'Enterprise cybersecurity news and analysis.'},
+      {t:'Vulnerability Management',u:'https://www.securityweek.com/category/vulnerabilities/',d:'Latest CVE and patch news.'},
+      {t:'Threat Intelligence',u:'https://www.securityweek.com/category/cyberwarfare/',d:'Nation-state threats and APT coverage.'},
+      {t:'Data Breaches',u:'https://www.securityweek.com/category/data-breaches/',d:'Major breach reporting and analysis.'},
+      {t:'Identity & Access',u:'https://www.securityweek.com/category/identity-access/',d:'IAM, MFA, and authentication coverage.'},
+    ],
+  },
+  ars: {
+    name:'Ars Technica', color:'#ff4e00',
+    url:'https://feeds.arstechnica.com/arstechnica/index', ck:'rss_ars',
+    fallback:[
+      {t:'Ars Technica — Technology Lab',u:'https://arstechnica.com/tech-policy/',d:'In-depth tech coverage and analysis.'},
+      {t:'Ars Technica — Science',u:'https://arstechnica.com/science/',d:'Science news and research.'},
+    ],
+  },
+};
+
+let cyberNewsActive = 'bleeping';
+
+function refreshCyberNews() {
+  if (cyberNewsActive === 'hn') {
+    try { SS(`hn_${year}_${month}_${day}_${new Date().getHours()}`, JSON.stringify({})); } catch(e){}
+    fetchCyberNewsHN();
+    return;
+  }
+  const src = cyberNewsActive === 'all'
+    ? Object.values(CYBER_NEWS_SOURCES)
+    : [CYBER_NEWS_SOURCES[cyberNewsActive]].filter(Boolean);
+  src.forEach(s => {
+    try { const o=JSON.parse(S(s.ck)||'{}'); o.ts=0; SS(s.ck,JSON.stringify(o)); } catch(e){}
+  });
+  cyberNewsActive === 'all' ? fetchAllCyberNews() : fetchCyberNewsSource(cyberNewsActive);
+}
+
+function switchCyberNews(key, btn) {
+  document.querySelectorAll('#cyber-news-tabs .wn-tab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  cyberNewsActive = key;
+  if (key === 'all') fetchAllCyberNews();
+  else if (key === 'hn') fetchCyberNewsHN();
+  else fetchCyberNewsSource(key);
+}
+
+async function fetchCyberNewsSource(key) {
+  const src = CYBER_NEWS_SOURCES[key];
+  if (!src) return;
+  const el  = document.getElementById('cyber-content');
+  if (!el) return;
+  el.innerHTML = '<div class="loading-shimmer shimmer-line" style="margin:14px 0 8px"></div><div class="loading-shimmer shimmer-line" style="width:85%;margin-bottom:8px"></div><div class="loading-shimmer shimmer-line" style="width:70%"></div>';
+
+  const cached = S(src.ck);
+  if (cached) {
+    try {
+      const {data,ts} = JSON.parse(cached);
+      if ((Date.now()-ts)/3600000 < 1) { renderCyberNews(data, src); return; }
+    } catch(e) {}
+  }
+  for (const proxy of [MY_RSS_PROXY, PROXY, PROXY2]) {
+    try {
+      const res  = await fetch(proxy + encodeURIComponent(src.url), {signal:AbortSignal.timeout(8000)});
+      if (!res.ok) continue;
+      const text = await res.text();
+      let xml; try { xml = JSON.parse(text).contents; } catch(e) { xml = text; }
+      if (xml && xml.length > 200 && xml.includes('<')) {
+        SS(src.ck, JSON.stringify({data:xml, ts:Date.now()}));
+        renderCyberNews(xml, src);
+        return;
+      }
+    } catch(e) { continue; }
+  }
+  if (src.fallback) renderStaticFeed('cyber-content','cyber-badge',src.name,src.fallback);
+  else renderStaticFeed('cyber-content','cyber-badge',src.name,[{t:src.name,u:'https://'+src.url.split('/')[2],d:'Live coverage from '+src.name+'.'}]);
+}
+
+function renderCyberNews(xml, src) {
+  const el  = document.getElementById('cyber-content');
+  const bdg = document.getElementById('cyber-badge');
+  if (!el) return;
+  const parser = new DOMParser();
+  const doc    = parser.parseFromString(xml,'text/xml');
+  const items  = Array.from(doc.querySelectorAll('item,entry')).slice(0,15);
+  if (!items.length) {
+    if (src.fallback) renderStaticFeed('cyber-content','cyber-badge',src.name,src.fallback);
+    return;
+  }
+  if (bdg) bdg.textContent = new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  el.innerHTML = items.map(item => {
+    const title = item.querySelector('title')?.textContent?.trim()||'';
+    let link    = item.querySelector('link')?.textContent?.trim()||item.querySelector('link')?.getAttribute('href')||'#';
+    const pub   = item.querySelector('pubDate')?.textContent||item.querySelector('updated')?.textContent||'';
+    const desc  = item.querySelector('description')?.textContent||item.querySelector('summary')?.textContent||'';
+    const div   = document.createElement('div'); div.innerHTML=desc;
+    const clean = div.textContent.replace(/\s+/g,' ').trim().slice(0,120);
+    const ago   = pub ? timeSince(new Date(pub)) : '';
+    return `<div class="news-item">
+      <a class="news-title" href="${esc(link)}" target="_blank" rel="noopener">${esc(title)}</a>
+      ${clean?`<div class="news-desc">${esc(clean)}${clean.length>=120?'...':''}</div>`:''}
+      <div class="news-meta">${esc(src.name)}${ago?' · '+ago:''}</div>
+    </div>`;
+  }).join('') +
+  `<div style="font-family:'DM Mono',monospace;font-size:.58rem;color:var(--muted2);padding:10px 0 14px;text-align:right">Fetched ${new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>`;
+}
+
+// ── Hacker News tab (uses HN Firebase API directly)
+async function fetchCyberNewsHN() {
+  const el  = document.getElementById('cyber-content');
+  const bdg = document.getElementById('cyber-badge');
+  if (!el) return;
+  el.innerHTML = '<div class="loading-shimmer shimmer-line" style="margin:14px 0 8px"></div><div class="loading-shimmer shimmer-line" style="width:85%;margin-bottom:8px"></div>';
+
+  const ck = `hn_${year}_${month}_${day}_${new Date().getHours()}`;
+  let stories;
+  const cached = S(ck);
+  if (cached) { try { stories = JSON.parse(cached); } catch(e){} }
+  if (!stories || !stories.length) {
+    try {
+      const ids = await fetch('https://hacker-news.firebaseio.com/v0/topstories.json').then(r=>r.json());
+      stories = await Promise.all(ids.slice(0,12).map(id =>
+        fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`).then(r=>r.json())
+      ));
+      stories = stories.filter(s=>s&&s.title).slice(0,12);
+      SS(ck, JSON.stringify(stories));
+    } catch(e) {
+      el.innerHTML = '<div class="error-msg" style="margin:14px 0">Could not load Hacker News.</div>';
+      return;
+    }
+  }
+  if (bdg) bdg.textContent = new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  el.innerHTML = stories.map(s => {
+    const link = s.url || `https://news.ycombinator.com/item?id=${s.id}`;
+    const ago  = s.time ? timeSince(new Date(s.time*1000)) : '';
+    return `<div class="news-item">
+      <a class="news-title" href="${esc(link)}" target="_blank" rel="noopener">${esc(s.title)}</a>
+      <div class="news-meta">Hacker News · ▲ ${s.score||0} · ${s.descendants||0} comments${ago?' · '+ago:''}</div>
+    </div>`;
+  }).join('') +
+  `<div style="font-family:'DM Mono',monospace;font-size:.58rem;color:var(--muted2);padding:10px 0 14px;text-align:right">Fetched ${new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>`;
+}
+
+async function fetchAllCyberNews() {
+  const el  = document.getElementById('cyber-content');
+  const bdg = document.getElementById('cyber-badge');
+  if (!el) return;
+  el.innerHTML = '<div class="loading-shimmer shimmer-line" style="margin:14px 0 8px"></div><div class="loading-shimmer shimmer-line" style="width:85%;margin-bottom:8px"></div>';
+
+  const allItems = [];
+
+  await Promise.allSettled(Object.entries(CYBER_NEWS_SOURCES).map(async ([key,src]) => {
+    let xml;
+    const cached = S(src.ck);
+    if (cached) {
+      try { const {data,ts}=JSON.parse(cached); if((Date.now()-ts)/3600000<1){xml=data;} } catch(e){}
+    }
+    if (!xml) {
+      for (const proxy of [MY_RSS_PROXY, PROXY, PROXY2]) {
+        try {
+          const res = await fetch(proxy+encodeURIComponent(src.url),{signal:AbortSignal.timeout(8000)});
+          if (!res.ok) continue;
+          const text = await res.text();
+          let c; try { c=JSON.parse(text).contents; } catch(e){c=text;}
+          if (c && c.length>200 && c.includes('<')) { xml=c; SS(src.ck,JSON.stringify({data:xml,ts:Date.now()})); break; }
+        } catch(e){continue;}
+      }
+    }
+    if (!xml) return;
+    const parser = new DOMParser();
+    const doc    = parser.parseFromString(xml,'text/xml');
+    Array.from(doc.querySelectorAll('item,entry')).slice(0,7).forEach(item => {
+      const title = item.querySelector('title')?.textContent?.trim()||'';
+      let link    = item.querySelector('link')?.textContent?.trim()||item.querySelector('link')?.getAttribute('href')||'';
+      const pub   = item.querySelector('pubDate')?.textContent||item.querySelector('updated')?.textContent||'';
+      const desc  = item.querySelector('description')?.textContent||item.querySelector('summary')?.textContent||'';
+      const div   = document.createElement('div'); div.innerHTML=desc;
+      const clean = div.textContent.replace(/\s+/g,' ').trim().slice(0,100);
+      if (title) allItems.push({title,link:link.trim(),pub,desc:clean,source:src.name,color:src.color,ts:pub?new Date(pub).getTime():0});
+    });
+  }));
+
+  try {
+    const hnCk = `hn_${year}_${month}_${day}_${new Date().getHours()}`;
+    let stories;
+    const cached = S(hnCk);
+    if (cached) { try { stories = JSON.parse(cached); } catch(e){} }
+    if (!stories || !stories.length) {
+      const ids = await fetch('https://hacker-news.firebaseio.com/v0/topstories.json').then(r=>r.json());
+      stories = await Promise.all(ids.slice(0,12).map(id =>
+        fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`).then(r=>r.json())
+      ));
+      stories = stories.filter(s=>s&&s.title).slice(0,12);
+      SS(hnCk, JSON.stringify(stories));
+    }
+    stories.slice(0,7).forEach(s => {
+      allItems.push({
+        title:s.title,
+        link:s.url || `https://news.ycombinator.com/item?id=${s.id}`,
+        pub:'', desc:`▲ ${s.score||0} · ${s.descendants||0} comments`,
+        source:'Hacker News', color:'#ff6600',
+        ts:s.time?s.time*1000:0
+      });
+    });
+  } catch(e) {}
+
+  allItems.sort((a,b) => b.ts-a.ts);
+  if (bdg) bdg.textContent = allItems.length+' articles';
+  if (!allItems.length) { el.innerHTML='<div class="error-msg" style="margin:14px 0">Could not load news sources.</div>'; return; }
+
+  el.innerHTML = allItems.map(item => `
+    <div class="news-item">
+      <span class="news-source-chip" style="border-color:${item.color}33;color:${item.color}">${esc(item.source)}</span>
+      <a class="news-title" href="${esc(item.link)}" target="_blank" rel="noopener">${esc(item.title)}</a>
+      ${item.desc?`<div class="news-desc">${esc(item.desc)}${item.desc.length>=100?'...':''}</div>`:''}
+      <div class="news-meta">${item.pub?timeSince(new Date(item.pub)):''}</div>
+    </div>`).join('') +
+    `<div style="font-family:'DM Mono',monospace;font-size:.58rem;color:var(--muted2);padding:10px 0 14px;text-align:right">All sources · ${new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>`;
+}
+
 
 // ── BleepingComputer
 async function fetchBleeping() {
@@ -2026,9 +2201,7 @@ function renderHN(stories) {
 // ── Launch all feeds immediately on load
 (function launchAllFeeds() {
   fetchAPNews();
-  fetchHN();
-  fetchBleeping();
-  fetchDarkReading();
+  fetchCyberNewsSource('bleeping');
   fetchAtlas();
   const el = document.getElementById('feeds-refresh-time');
   if (el) {
@@ -3102,62 +3275,6 @@ if (navigator.geolocation) {
 } else { fetchSunTimes(34.0522,-118.2437,'Los Angeles'); }
 
 // ═══════════════════════════════════════════════════
-// AMBIENT SOUNDS
-// ═══════════════════════════════════════════════════
-let ambCtx=null, ambNodes={}, curAmb=null, ambVol=0.5;
-function getACtx() { if (!ambCtx) ambCtx = new(window.AudioContext||window.webkitAudioContext)(); return ambCtx; }
-function makeNoise(ctx, type) {
-  const sz=2*ctx.sampleRate, buf=ctx.createBuffer(1,sz,ctx.sampleRate), dat=buf.getChannelData(0); let lo=0;
-  for(let i=0;i<sz;i++){const w=Math.random()*2-1;if(type==='rain'){dat[i]=(lo+(0.02*w))/1.02;lo=dat[i];}else if(type==='forest'){dat[i]=Math.sin(i*0.002+Math.random()*0.1)*0.3*Math.random();}else if(type==='waves'){dat[i]=Math.sin(i*0.0005)*Math.random()*0.8;}else if(type==='fire'){dat[i]=(lo+(0.05*w))/1.02*0.8;lo=dat[i];}else dat[i]=w*0.5;}
-  const s=ctx.createBufferSource(); s.buffer=buf; s.loop=true; return s;
-}
-function toggleAmbient(type) {
-  if (curAmb===type) { stopAmb(); curAmb=null; return; }
-  stopAmb();
-  try {
-    const ctx=getACtx(); if(ctx.state==='suspended')ctx.resume();
-    const g=ctx.createGain(); g.gain.value=ambVol; g.connect(ctx.destination);
-    const s=makeNoise(ctx,type); s.connect(g); s.start(0);
-    ambNodes[type]={source:s,gainNode:g}; curAmb=type;
-    document.querySelectorAll('.ambient-btn').forEach(b=>b.classList.remove('playing'));
-    document.getElementById('amb-'+type).classList.add('playing');
-  } catch(e) {}
-}
-function stopAmb() {
-  if (curAmb&&ambNodes[curAmb]) { try{ambNodes[curAmb].source.stop();ambNodes[curAmb].gainNode.disconnect();}catch(e){} delete ambNodes[curAmb]; }
-  document.querySelectorAll('.ambient-btn').forEach(b=>b.classList.remove('playing'));
-}
-function setVolume(val) { ambVol=parseFloat(val); if(curAmb&&ambNodes[curAmb])ambNodes[curAmb].gainNode.gain.value=ambVol; }
-
-// ═══════════════════════════════════════════════════
-// QUICK LINKS
-// ═══════════════════════════════════════════════════
-let links = JSON.parse(S('dash_links')||'null') || [
-  {id:1,name:'Google',url:'https://google.com'},{id:2,name:'Gmail',url:'https://mail.google.com'},
-  {id:3,name:'GitHub',url:'https://github.com'},{id:4,name:'YouTube',url:'https://youtube.com'},
-  {id:5,name:'Wikipedia',url:'https://wikipedia.org'},{id:6,name:'Reddit',url:'https://reddit.com'},
-];
-function saveLinks() { SS('dash_links', JSON.stringify(links)); renderLinks(); }
-function addLink() {
-  const name=document.getElementById('linkName').value.trim(), url=document.getElementById('linkUrl').value.trim();
-  if (!url) return;
-  const cu = url.startsWith('http') ? url : 'https://'+url;
-  links.push({id:Date.now(), name: name||new URL(cu).hostname, url:cu});
-  document.getElementById('linkName').value=''; document.getElementById('linkUrl').value='';
-  saveLinks();
-}
-function renderLinks() {
-  document.getElementById('links-grid').innerHTML = links.map(l=>{
-    const d = new URL(l.url).hostname;
-    return `<a class="link-item" href="${esc(l.url)}" target="_blank" rel="noopener" title="${esc(l.name)}">
-      <img class="link-favicon" src="https://www.google.com/s2/favicons?domain=${d}&sz=32" onerror="this.style.display='none'" alt="">
-      <div class="link-name">${esc(l.name)}</div>
-    </a>`;
-  }).join('');
-}
-renderLinks();
-
-// ═══════════════════════════════════════════════════
 // LOCAL EVENTS
 // ═══════════════════════════════════════════════════
 let curEventCat='concerts', eventsCity='';
@@ -4100,7 +4217,7 @@ fetchZooAnimal();
 const DRAG_STORAGE_KEY = 'dash_row_order';
 const ROW_LABELS = {
   'row-weather-aqi-sun':       'Weather · AQI · Sun',
-  'row-news-feeds':          'News Feeds',
+  'row-news-feeds':          'World News',
   'row-atlas-github':        'Atlas + GitHub',
   'row-apod-history':        'APOD + History',
   'row-earth-smithsonian':   'Earth Obs + Smithsonian',
@@ -4113,7 +4230,7 @@ const ROW_LABELS = {
   'row-markets':             'Markets',
   'row-shodan-hibp-wolfram': 'Shodan · HIBP · Wolfram',
   'row-recipe':              'Daily Recipe',
-  'row-news-security':       'BleepingComputer · SecurityWeek · Dark Reading',
+  'row-cyber-news':          'Cyber & Tech News',
   'row-daily-comic':         'Daily Comic',
   'row-api-zoo-urlscan':     'API Ninjas · URLScan · Zoo',
 };
@@ -4475,7 +4592,6 @@ async function fetchArs() {
     {t:'Ars Technica — Security',u:'https://arstechnica.com/security/',d:'Cybersecurity news and vulnerability coverage.'},
   ]);
 }
-fetchArs();
 
 // ═══════════════════════════════════════════════════
 // SECURITY WEEK RSS
@@ -4507,7 +4623,6 @@ async function fetchSecurityWeek() {
     {t:'Identity & Access',u:'https://www.securityweek.com/category/identity-access/',d:'IAM, MFA, and authentication coverage.'},
   ]);
 }
-fetchSecurityWeek();
 
 // ═══════════════════════════════════════════════════
 // EXPLOSM / CYANIDE & HAPPINESS — Daily Comic
@@ -4642,12 +4757,12 @@ document.getElementById('footer-ts').textContent =
 
   // ====== PLACEHOLDER: Replace with your Firebase config ======
   const firebaseConfig = {
-        apiKey: "AIzaSyBlB1ghkwptODOfQhcrHAXoGOcQaP04rzI",
-        authDomain: "taskwidget-dashboard.firebaseapp.com",
-        projectId: "taskwidget-dashboard",
-        storageBucket: "taskwidget-dashboard.firebasestorage.app",
-        messagingSenderId: "544817573184",
-        appId: "1:544817573184:web:6e3fa493d300f86c2b9ea5"
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
   };
   // ==============================================================
 
@@ -4661,8 +4776,12 @@ document.getElementById('footer-ts').textContent =
   const taskForm = document.getElementById('taskForm');
   const taskText = document.getElementById('taskText');
   const taskCategory = document.getElementById('taskCategory');
+  const trashToggleBtn = document.getElementById('trashToggleBtn');
 
   const CATEGORY_ORDER = ["Today", "Tomorrow", "Costco", "Grocery store", "Work", "Personal"];
+
+  let allTasks = [];
+  let showTrash = false;
 
   function setStatus(msg, isErr) {
     statusEl.textContent = msg;
@@ -4686,25 +4805,45 @@ document.getElementById('footer-ts').textContent =
     }
   });
 
+  // --- Trash toggle ---
+  trashToggleBtn.addEventListener("click", () => {
+    showTrash = !showTrash;
+    trashToggleBtn.classList.toggle("active", showTrash);
+    trashToggleBtn.textContent = showTrash ? "✅ Active" : "🗑 Trash";
+    taskForm.style.display = showTrash ? "none" : "";
+    render();
+  });
+
   // --- Real-time listener ---
   function listenToTasks() {
     const tasksRef = collection(db, "tasks");
     const q = query(tasksRef, orderBy("timestamp", "desc"));
 
     onSnapshot(q, (snapshot) => {
-      const tasks = [];
+      allTasks = [];
       snapshot.forEach((docSnap) => {
-        tasks.push({ docId: docSnap.id, ...docSnap.data() });
+        allTasks.push({ docId: docSnap.id, ...docSnap.data() });
       });
-      badgeEl.textContent = tasks.length + " items";
-      renderTasks(tasks);
+      render();
     }, (error) => {
       setStatus("Sync error: " + error.message, true);
       badgeEl.textContent = "error";
     });
   }
 
-  // --- Render grouped tasks ---
+  function render() {
+    if (showTrash) {
+      const trashed = allTasks.filter(t => t.deleted === true);
+      badgeEl.textContent = trashed.length + " in trash";
+      renderTrash(trashed);
+    } else {
+      const active = allTasks.filter(t => t.deleted !== true);
+      badgeEl.textContent = active.length + " items";
+      renderTasks(active);
+    }
+  }
+
+  // --- Render grouped tasks (active view) ---
   function renderTasks(tasks) {
     tasksContainer.innerHTML = "";
 
@@ -4797,7 +4936,7 @@ document.getElementById('footer-ts').textContent =
         const delBtn = document.createElement("button");
         delBtn.textContent = "Delete";
         delBtn.className = "task-btn task-btn-del";
-        delBtn.addEventListener("click", () => deleteTask(task.docId));
+        delBtn.addEventListener("click", () => softDeleteTask(task.docId));
 
         actions.appendChild(editBtn);
         actions.appendChild(delBtn);
@@ -4827,6 +4966,65 @@ document.getElementById('footer-ts').textContent =
     });
   }
 
+  // --- Render trash view ---
+  function renderTrash(tasks) {
+    tasksContainer.innerHTML = "";
+
+    const note = document.createElement("div");
+    note.className = "task-trash-note";
+    note.textContent = "Deleted items are kept here until permanently removed. Restore brings a task back to its original category, or purge it forever.";
+    tasksContainer.appendChild(note);
+
+    if (tasks.length === 0) {
+      const empty = document.createElement("div");
+      empty.className = "task-empty";
+      empty.textContent = "Trash is empty.";
+      tasksContainer.appendChild(empty);
+      return;
+    }
+
+    // Sort by most recently deleted first
+    tasks.sort((a, b) => (b.deletedAt || 0) - (a.deletedAt || 0));
+
+    tasks.forEach((task) => {
+      const row = document.createElement("div");
+      row.className = "task-row trashed";
+
+      const left = document.createElement("div");
+      left.className = "task-left";
+
+      const label = document.createElement("span");
+      label.textContent = task.text;
+      label.className = "task-text done";
+
+      left.appendChild(label);
+
+      const actions = document.createElement("div");
+      actions.className = "task-actions";
+
+      const restoreBtn = document.createElement("button");
+      restoreBtn.textContent = "Restore";
+      restoreBtn.className = "task-btn task-btn-restore";
+      restoreBtn.addEventListener("click", () => restoreTask(task.docId));
+
+      const purgeBtn = document.createElement("button");
+      purgeBtn.textContent = "Delete Forever";
+      purgeBtn.className = "task-btn task-btn-purge";
+      purgeBtn.addEventListener("click", () => {
+        if (confirm(`Permanently delete "${task.text.split("\n")[0]}"? This cannot be undone.`)) {
+          purgeTask(task.docId);
+        }
+      });
+
+      actions.appendChild(restoreBtn);
+      actions.appendChild(purgeBtn);
+
+      row.appendChild(left);
+      row.appendChild(actions);
+      tasksContainer.appendChild(row);
+    });
+  }
+
   // --- Actions ---
   async function toggleCompleted(docId, completed) {
     try {
@@ -4846,11 +5044,36 @@ document.getElementById('footer-ts').textContent =
     }
   }
 
-  async function deleteTask(docId) {
+  // Soft delete: mark as deleted instead of removing the document
+  async function softDeleteTask(docId) {
+    try {
+      await updateDoc(doc(db, "tasks", docId), {
+        deleted: true,
+        deletedAt: Date.now()
+      });
+    } catch (e) {
+      setStatus("Error deleting task: " + e.message, true);
+    }
+  }
+
+  // Restore from trash
+  async function restoreTask(docId) {
+    try {
+      await updateDoc(doc(db, "tasks", docId), {
+        deleted: false,
+        deletedAt: null
+      });
+    } catch (e) {
+      setStatus("Error restoring task: " + e.message, true);
+    }
+  }
+
+  // Permanently remove from Firestore
+  async function purgeTask(docId) {
     try {
       await deleteDoc(doc(db, "tasks", docId));
     } catch (e) {
-      setStatus("Error deleting task: " + e.message, true);
+      setStatus("Error purging task: " + e.message, true);
     }
   }
 
@@ -4867,6 +5090,7 @@ document.getElementById('footer-ts').textContent =
         text,
         completed: false,
         category,
+        deleted: false,
         timestamp: Date.now()
       });
       taskText.value = "";
